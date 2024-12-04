@@ -1,7 +1,7 @@
 body {
     display: flex;
-    height: 100vh;
-    margin: 0;
+    flex-direction: column;
+    height: 100%;
     overflow: auto;
     font-family: "Open Sans", sans-serif;
     font-size: 1.2rem;
@@ -10,6 +10,9 @@ body {
 
 html {
     overflow: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar {
@@ -100,4 +103,24 @@ html {
     display: block;
     text-align: center;
     transition: width 1s ease-in-out;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-left: 10%;
+    margin-right: 5%;
+    border-radius: 20px;
+    color: white;
+    transition: margin-left 0.3s ease-in-out;
+    background: linear-gradient(to right, #227db2, #41bde5);
+}
+
+footer.footer-expanded {
+    margin-left: 20%;
+}
+
+footer a {
+    color: white;
+    text-decoration: none;
 }

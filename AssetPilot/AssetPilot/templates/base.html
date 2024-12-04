@@ -54,23 +54,31 @@
 
 <div class="content" id="mainContent">
     {% block content %}
-    <h1>Welcome to MyApp</h1>
     {% endblock %}
 </div>
+
+<footer id="footer">
+    <p>&copy; 2024 AssetPilot. All Rights Reserved. | <a href="{% url 'contact-us' %}">Contact Us</a>
+    </p>
+</footer>
+
 
 <script>
     const sidebar = document.getElementById('sidebar');
     const content = document.getElementById('mainContent');
+    const footer = document.getElementById('footer');
 
     sidebar.addEventListener('click', () => {
         sidebar.classList.add('expanded');
         content.classList.add('sidebar-expanded');
+        footer.classList.add('footer-expanded');
     });
 
     document.addEventListener('click', (e) => {
         if (!sidebar.contains(e.target)) {
             sidebar.classList.remove('expanded');
             content.classList.remove('sidebar-expanded');
+            footer.classList.remove('footer-expanded');
         }
     });
 </script>

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'pages/css/contact-us.css' %}">
+
+<section class="contact-hero">
+    <div class="contact-text text-start">
+        <h1>Contact Us</h1>
+        <p>If you have any questions or need assistance, feel free to reach us at:</p>
+    </div>
+    <div class="contact-info">
+        <p><strong>Phone:</strong> +359-884-237-502</p>
+        <p><strong>Email:</strong> <a href="mailto:assetPilot@abv.bg">assetPilot@abv.bg</a></p>
+    </div>
+</section>
+
+
+<div class="container d-flex justify-content-center align-items-center">
+    <div class="card shadow-lg">
+        <div class="card-body p-5 text-white">
+            <h2 class="text-center mb-4">Send Us a Message</h2>
+            {% if error %}
+            <div class="alert alert-danger text-center">{{ error }}</div>
+            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                </div>
+                <div class = "text-center">
+                    <button type="submit" class="btn btn-light w-50 rounded-pill mt-4">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
