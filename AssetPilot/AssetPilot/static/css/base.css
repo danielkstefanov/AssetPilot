@@ -1,0 +1,103 @@
+body {
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    font-family: "Open Sans", sans-serif;
+    font-size: 1.2rem;
+    color: #002a5e;
+}
+
+.sidebar {
+    height: 100%;
+    width: 110px;
+    position: fixed;
+    transition: width 0.3s ease-in-out;
+    overflow-x: hidden;
+    z-index: 1000;
+    background: linear-gradient(to right, #cee7ff 60%, rgba(229, 241, 255, 0.2));
+}
+
+.sidebar.expanded {
+    width: 300px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    padding: 15px;
+    cursor: pointer;
+
+}
+
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.sidebar ul li a:hover {
+    background-color: #c7e4ff;
+}
+
+.content {
+    flex: 1;
+    margin-left: 110px;
+    padding: 20px;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.content.sidebar-expanded {
+    margin-left: 300px;
+}
+
+.sidebar .logo {
+    display: block;
+    margin: 0 auto;
+    transition: width 0.3s ease-in-out;
+    width: 80px;
+}
+
+.sidebar.expanded .logo {
+    width: 180px;
+}
+
+.sidebar .nav-item {
+    width: 100%;
+}
+
+.sidebar .sidebar-text {
+    display: none;
+    color: #002a5e;
+    font-size: 2rem;
+    text-align: center;
+    width: 100%;
+}
+
+.sidebar.expanded .sidebar-text {
+    display: block;
+}
+
+.sidebar .sidebar-icon {
+    font-size: 40px;
+    color: #003575;
+}
+
+.sidebar.expanded .sidebar-icon {
+    transition: width 1s ease-in-out;
+    margin-left: 20px;
+}
+
+.sidebar .project-title {
+    display: none;
+}
+
+.sidebar.expanded .project-title {
+    display: block;
+    text-align: center;
+    transition: width 1s ease-in-out;
+}
