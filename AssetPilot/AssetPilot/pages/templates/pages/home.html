@@ -1,5 +1,50 @@
 {% extends "base.html" %}
+
+{% load static %}
+
 {% block content %}
-<h1>Welcome to My Website</h1>
-<p>This is the home page.</p>
+<link rel="stylesheet" href="{% static 'pages/css/home.css' %}">
+
+<section class="hero">
+    <div class="hero-text">
+        <h1>Welcome to AssetPilot</h1>
+        <p>Your partner in rational investment decisions and portfolio management.</p>
+    </div>
+    <div class="hero-buttons">
+        <a href="{% url 'register' %}" class="nav-link" style="margin-bottom: 10px;">
+            <i class="sidebar-icon fa-solid fa-address-card"></i> <span>Get Started</span>
+        </a>
+        <a href="{% url 'login' %}" class="nav-link">
+            <i class="sidebar-icon fa-solid fa-right-to-bracket"></i> <span>Login</span>
+        </a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 feature">
+                <img src="{% static 'images/portfolio.png' %}" alt="Portfolio Icon">
+                <h3>Portfolio Management</h3>
+                <p>Easily track and manage all your trades in one place.</p>
+            </div>
+            <div class="col-md-4 feature">
+                <img src="{% static 'images/ai.png' %}" alt="AI Icon">
+                <h3>AI-Powered Insights</h3>
+                <p>Get news sentiment analysis to make data-driven decisions.</p>
+            </div>
+            <div class="col-md-4 feature">
+                <img src="{% static 'images/checklist.png' %}" alt="Checklist Icon">
+                <h3>Personalized Checklists</h3>
+                <p>Create custom pre-trade workflows to minimize impulsive decisions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2024 AssetPilot. All Rights Reserved. | <a href="/contact">Contact Us</a>
+    </p>
+</footer>
 {% endblock %}
