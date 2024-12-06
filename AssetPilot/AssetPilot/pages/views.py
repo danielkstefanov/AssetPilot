@@ -1,7 +1,5 @@
 import os
-from django.shortcuts import render
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from mailjet_rest import Client
 
@@ -10,14 +8,15 @@ def home_view(request):
     return render(request, 'pages/home.html')
 
 
-# Replace with your Mailjet API credentials
-MAILJET_API_KEY = 'your_mailjet_api_key'
-MAILJET_API_SECRET = 'your_mailjet_api_secret'
-MAILJET_EMAIL = 'assetPilot@abv.bg'
+MAILJET_API_KEY = os.environ.get('MAILJET_API_KEY')
+MAILJET_API_SECRET = os.environ.get('MAILJET_API_SECRET')
+MAILJET_EMAIL = os.environ.get('MAILJET_EMAIL')
 
 
 def contact_us_view(request):
     if request.method == 'POST':
+
+        print(MAILJET_API_KEY)
 
         if not request.user.is_authenticated:
             return render(request, 'pages/contact-us.html', {'error': 'You have to be logged in!'})
@@ -27,19 +26,18 @@ def contact_us_view(request):
         user_email = request.user.email
 
         if subject and message:
-            # Send email using Mailjet
             mailjet = Client(auth=(MAILJET_API_KEY, MAILJET_API_SECRET), version='v3.1')
             data = {
                 'Messages': [
                     {
                         "From": {
                             "Email": MAILJET_EMAIL,
-                            "Name": "AssetPilot"
+                            "Name": "Asset Pilot"
                         },
                         "To": [
                             {
                                 "Email": MAILJET_EMAIL,
-                                "Name": "Support"
+                                "Name": "Support Team"
                             }
                         ],
                         "Subject": subject,
