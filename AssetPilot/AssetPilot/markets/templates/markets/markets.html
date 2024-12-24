@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Markets Page{% endblock %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'markets/css/markets.css' %}">
+
+<div class="trading-layout">
+    <div class="left-panel">
+        <div class="search-container">
+            <form method="GET" class="search-form">
+                <div class="search-input-container">
+                    <input type="text" name="q" id="search" class="search-input"
+                        placeholder="Search company or ticker..." autocomplete="off" required>
+                    <button type="submit" class="search-button">🔍</button>
+                </div>
+                <div id="search-suggestions" class="search-suggestions"></div>
+            </form>
+        </div>
+        <div id="tradingview-chart"></div>
+    </div>
+
+    <div class="right-panel">
+        <div class="trading-form">
+            <h3>Trading Panel</h3>
+            <div class="strategy-selector">
+                <span>using strategy</span>
+                <select name="strategy" id="strategy">
+                    <option value="add">add strategy</option>
+                </select>
+            </div>
+
+            <form method="POST" class="order-form">
+                {% csrf_token %}
+                <div class="order-type">
+                    <button type="button" class="order-btn buy active" data-type="buy">Buy</button>
+                    <button type="button" class="order-btn sell" data-type="sell">Sell</button>
+                </div>
+                <div class="amount-input">
+                    <label for="amount">Amount</label>
+                    <input type="number" id="amount" name="amount" step="0.1" min="0" value="1.5">
+                </div>
+                <input type="hidden" name="order_type" id="order_type" value="buy">
+                <button type="submit" class="confirm-btn">Confirm</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    new TradingView.widget({
+        "container_id": "tradingview-chart",
+        "symbol": "{{ search_query|default:'AAPL' }}",
+        "locale": "en",
+        "width": "100%",
+        "height": "100%",
+        "style": "2",
+        "timezone": "Etc/UTC",
+        "enable_publishing": false,
+        "allow_symbol_change": false,
+        "hide_top_toolbar": false,
+        "save_image": false,
+        "details": false,
+    });
+
+    document.querySelectorAll('.order-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            document.querySelectorAll('.order-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('order_type').value = this.dataset.type;
+        });
+    });
+
+    document.querySelector('.order-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        if (!confirm('Are you sure you want to confirm this order?')) {
+            return;
+        }
+
+        const form = e.target;
+        const formData = new FormData(form);
+        await fetch('', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            }
+        });
+    });
+
+    let searchTimeout;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search');
+        const suggestionsContainer = document.getElementById('search-suggestions');
+
+        searchInput.addEventListener('input', function () {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+
+            if (query.length < 2) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                await fetch(`/markets/search-stocks/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            suggestionsContainer.innerHTML = '';
+
+                            data.forEach(item => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.innerHTML = `
+                                    <span class="suggestion-symbol">${item.symbol}</span>
+                                    <span class="suggestion-name">${item.name}</span>
+                                `;
+
+                                div.addEventListener('click', () => {
+                                    searchInput.value = item.symbol;
+                                    suggestionsContainer.style.display = 'none';
+                                    searchInput.form.submit();
+                                });
+
+                                suggestionsContainer.appendChild(div);
+                            });
+
+                            suggestionsContainer.style.display = 'block';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }, 200);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+{% endblock %}

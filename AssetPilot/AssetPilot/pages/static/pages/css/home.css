@@ -5,15 +5,13 @@
     padding: 50px;
     margin-left: 5%;
     margin-right: 5%;
-    margin-top: 50px;
     text-align: center;
     display: flex;
 }
 
-
 .hero-text {
     text-align: center;
-    margin-right: auto;
+    margin: auto;
 }
 
 .hero-buttons {
