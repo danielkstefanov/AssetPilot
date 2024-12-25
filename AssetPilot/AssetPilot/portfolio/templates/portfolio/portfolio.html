@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'portfolio/css/portfolio.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="portfolio-container">
+    <div class="portfolio-grid">
+        <div class="chart-section">
+            <h2>Portfolio Allocation</h2>
+            <div class="chart-container">
+                <canvas id="portfolioChart"></canvas>
+            </div>
+        </div>
+
+        <div class="suggestions-section">
+            <h2>Suggestions</h2>
+            <div id="suggestions-container">
+
+            </div>
+        </div>
+
+        <div class="trades-section">
+            <h2>Open Trades</h2>
+            <div class="trades-container">
+                <table class="trades-table">
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Quantity</th>
+                            <th>Trade Type</th>
+                            <th>Price</th>
+                            <th>P/L %</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trades-body">
+                        {% for trade in open_trades_data %}
+                        <tr data-trade-id="{{ trade.id }}">
+                            <td>{{ trade.ticker }}</td>
+                            <td>{{ trade.amount }}</td>
+                            <td class="trade_type_td {% if trade.trade_type == 'BUY' %}profit{% else %}loss{% endif %}">
+                                {{ trade.trade_type }}
+                            </td>
+                            <td>${{ trade.price }}</td>
+                            <td class="{% if trade.profit_loss_percentage >= 0 %}profit{% else %}loss{% endif %}">
+                                {{ trade.profit_loss_percentage }}%
+                            </td>
+                            <td>
+                                <button class="close-trade-btn" data-trade-id="{{ trade.id }}">Close</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('portfolioChart').getContext('2d');
+        let portfolioChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+
+        fetchPortfolioData();
+
+        document.querySelectorAll('.close-trade-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const tradeId = this.dataset.tradeId;
+                closeTrade(tradeId);
+            });
+        });
+
+        async function fetchPortfolioData() {
+            try {
+                const response = await fetch('/portfolio/data/');
+                const data = await response.json();
+                updateChart(data.allocation);
+                updateSuggestions(data.suggestions);
+            } catch (error) {
+                console.error('Error fetching portfolio data:', error);
+            }
+        }
+
+        function updateChart(allocation) {
+            portfolioChart.data.labels = allocation.map(item => item.symbol);
+            portfolioChart.data.datasets[0].data = allocation.map(item => item.percentage);
+            portfolioChart.update();
+        }
+
+        function updateSuggestions(suggestions) {
+            const container = document.getElementById('suggestions-container');
+            container.innerHTML = suggestions.map(suggestion =>
+                `<div class="suggestion-item">${suggestion}</div>`
+            ).join('');
+        }
+
+        async function closeTrade(tradeId) {
+            await fetch(`/portfolio/close-trade/${tradeId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            });
+            const row = document.querySelector(`tr[data-trade-id="${tradeId}"]`);
+            row.remove();
+            fetchPortfolioData();
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    }); 
+</script>
+
+{% endblock %}

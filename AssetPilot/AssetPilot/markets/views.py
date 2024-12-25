@@ -1,10 +1,11 @@
 import os
-from django.shortcuts import render, redirect
+import finnhub
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Trade
-import finnhub
-from django.conf import settings
+from utils.trading import get_ticker_price
+
 
 FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
 finnhub_client = finnhub.Client(FINNHUB_API_KEY)
@@ -12,26 +13,21 @@ finnhub_client = finnhub.Client(FINNHUB_API_KEY)
 
 @login_required
 def markets_home_view(request):
-    ticker = request.GET.get("q", "AAPL")
+    ticker = request.GET.get("q", "AAPL").upper()
 
     if request.method == "POST":
-        try:
-            trade_type = request.POST.get("order_type").upper()
-            amount = request.POST.get("amount")
+        trade_type = request.POST.get("order_type").upper()
+        amount = request.POST.get("amount")
 
-            quote = finnhub_client.quote(ticker)
-            current_price = quote["c"]
+        current_price = get_ticker_price(ticker)
 
-            Trade.objects.create(
-                user=request.user,
-                ticker=ticker,
-                trade_type=trade_type,
-                amount=amount,
-                price=current_price,
-            )
-
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+        Trade.objects.create(
+            user=request.user,
+            ticker=ticker,
+            trade_type=trade_type,
+            amount=amount,
+            price=current_price,
+        )
     elif request.method == "GET":
         context = {"search_query": ticker}
         return render(request, "markets/markets.html", context)
