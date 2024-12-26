@@ -1,11 +1,13 @@
 import finnhub
 import os
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from markets.models import Trade
 from utils.trading import get_ticker_price
+import yfinance as yf
+from datetime import datetime, timedelta
 
 FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
 finnhub_client = finnhub.Client(FINNHUB_API_KEY)
@@ -69,3 +71,58 @@ def portfolio_data(request):
 def close_trade(request, trade_id):
     trade = Trade.objects.get(id=trade_id, user=request.user)
     trade.close()
+
+
+@login_required
+def trade_detail(request, trade_id):
+    trade = Trade.objects.get(id=trade_id, user=request.user)
+
+    current_price = get_ticker_price(trade.ticker)
+    profit_loss = ((current_price - float(trade.price)) / float(trade.price)) * 100
+
+    context = {
+        "trade": trade,
+        "current_price": round(current_price, 2),
+        "profit_loss": round(profit_loss, 2),
+        "ai_analysis": [],
+    }
+
+    return render(request, "portfolio/trade_detail.html", context)
+    # ticker = yf.Ticker(trade.ticker)
+    # if ticker is None:
+    # else:
+    #     hist = ticker.history(period="1mo")
+    #     ai_analysis = []
+    #     if len(hist) >= 14:
+    #         delta = hist["Close"].diff()
+    #         gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+    #         loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+    #         rs = gain / loss
+    #         rsi = 100 - (100 / (1 + rs.iloc[-1]))
+
+    #         if rsi > 70:
+    #             ai_analysis.append(
+    #                 f"The RSI is {round(rsi, 2)} which indicates that {trade.ticker} might be overbought"
+    #             )
+    #         elif rsi < 30:
+    #             ai_analysis.append(
+    #                 f"The RSI is {round(rsi, 2)} which indicates that {trade.ticker} might be oversold"
+    #             )
+
+    #     ma20 = hist["Close"].rolling(window=20).mean().iloc[-1]
+    #     current_price = hist["Close"].iloc[-1]
+
+    #     if current_price > ma20:
+    #         ai_analysis.append(
+    #             f"Price is above 20-day moving average, suggesting an upward trend"
+    #         )
+    #     else:
+    #         ai_analysis.append(
+    #             f"Price is below 20-day moving average, suggesting a downward trend"
+    #         )
+
+    #     avg_volume = hist["Volume"].mean()
+    #     last_volume = hist["Volume"].iloc[-1]
+
+    #     if last_volume > avg_volume * 1.5:
+    #         ai_analysis.append("Trading volume is significantly higher than average")

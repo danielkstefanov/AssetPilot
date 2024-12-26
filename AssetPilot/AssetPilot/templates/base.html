@@ -20,67 +20,70 @@
 </head>
 
 <body>
-    <nav class="sidebar" id="sidebar">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <h1 class="project-title">AssetPilot</h1>
-                <img class="logo" src="{% static 'images/logo.ico' %}" alt="AssetPilot Logo">
-            </li>
-            <li class="nav-item">
-                <a href="/" class="nav-link">
-                    <i class="sidebar-icon fa-solid fa-house"></i> <span class="sidebar-text">Home</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/profile" class="nav-link">
-                    <i class="sidebar-icon fa-solid fa-user"></i> <span class="sidebar-text">Profile</span>
-                </a>
-            </li>
-            {% if user.is_authenticated %}
+    <div class="page-container">
+        <div class="content-wrap">
+            <nav class="sidebar" id="sidebar">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <h1 class="project-title">AssetPilot</h1>
+                        <img class="logo" src="{% static 'images/logo.ico' %}" alt="AssetPilot Logo">
+                    </li>
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">
+                            <i class="sidebar-icon fa-solid fa-house"></i> <span class="sidebar-text">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/profile" class="nav-link">
+                            <i class="sidebar-icon fa-solid fa-user"></i> <span class="sidebar-text">Profile</span>
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
 
-            <li class="nav-item">
-                <a href="{% url 'portfolio' %}" class="nav-link">
-                    <i class="sidebar-icon fa-solid fa-briefcase"></i> <span class="sidebar-text">Portfolio</span>
-                </a>
-            </li>
+                    <li class="nav-item">
+                        <a href="{% url 'portfolio' %}" class="nav-link">
+                            <i class="sidebar-icon fa-solid fa-briefcase"></i> <span class="sidebar-text">Portfolio</span>
+                        </a>
+                    </li>
 
-            <li class="nav-item">
-                <a href="{% url 'markets-home-view' %}" class="nav-link">
-                    <i class="sidebar-icon fa-solid fa-chart-line"></i> <span class="sidebar-text">Markets</span>
-                </a>
-            </li>
+                    <li class="nav-item">
+                        <a href="{% url 'markets-home-view' %}" class="nav-link">
+                            <i class="sidebar-icon fa-solid fa-chart-line"></i> <span class="sidebar-text">Markets</span>
+                        </a>
+                    </li>
 
-            <li class="nav-item">
-                <a href="{% url 'logout' %}" class="nav-link">
-                    <i class="sidebar-icon fa-solid fa-right-from-bracket"></i> <span class="sidebar-text">Logout</span>
-                </a>
-            </li>
-            {% else %}
-            <li class="nav-item">
-                <a href="{% url 'login' %}" class="nav-link">
-                    <i class="sidebar-icon fa-solid fa-right-to-bracket"></i> <span class="sidebar-text">Login</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'register' %}" class="nav-link">
-                    <i class="sidebar-icon fa-solid fa-address-card"></i> <span class="sidebar-text">Register</span>
-                </a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
+                    <li class="nav-item">
+                        <a href="{% url 'logout' %}" class="nav-link">
+                            <i class="sidebar-icon fa-solid fa-right-from-bracket"></i> <span class="sidebar-text">Logout</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="nav-link">
+                            <i class="sidebar-icon fa-solid fa-right-to-bracket"></i> <span class="sidebar-text">Login</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'register' %}" class="nav-link">
+                            <i class="sidebar-icon fa-solid fa-address-card"></i> <span class="sidebar-text">Register</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
 
-    <div class="content" id="mainContent">
-        {% block content %}
-        {% endblock %}
+            <div class="content" id="mainContent">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+        
+        <footer id="footer">
+            <p>&copy; 2024 AssetPilot. All Rights Reserved. | <a style="text-decoration: underline;"
+                    href="{% url 'contact-us' %}">Contact Us</a>
+            </p>
+        </footer>
     </div>
-
-    <footer id="footer">
-        <p>&copy; 2024 AssetPilot. All Rights Reserved. | <a style="text-decoration: underline;"
-                href="{% url 'contact-us' %}">Contact Us</a>
-        </p>
-    </footer>
-
 
     <script>
         const sidebar = document.getElementById('sidebar');

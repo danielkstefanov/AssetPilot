@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'portfolio/css/trade_detail.css' %}">
+<script src="{% static 'portfolio/js/trade_utils.js' %}"></script>
+
+<div class="trade-detail-container">
+    <div class="trade-detail-grid">
+        <div class="chart-section">
+            <div class="tradingview-widget-container">
+                <div id="tradingview_chart"></div>
+            </div>
+        </div>
+
+        <div class="trade-info-section">
+            <div class="trade-info-card">
+                <h2>Trade Information</h2>
+                <div class="trade-info-content">
+                    <div class="info-row">
+                        <span class="label">Symbol:</span>
+                        <span class="value">{{ trade.ticker }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Type:</span>
+                        <span class="value {% if trade.trade_type == 'BUY' %}profit{% else %}loss{% endif %}">
+                            {{ trade.trade_type }}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Entry Price:</span>
+                        <span class="value">${{ trade.price }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Current Price:</span>
+                        <span class="value">${{ current_price }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Amount:</span>
+                        <span class="value">{{ trade.amount }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">P/L:</span>
+                        <span class="value {% if profit_loss >= 0 %}profit{% else %}loss{% endif %}">
+                            {{ profit_loss }}%
+                        </span>
+                    </div>
+                </div>
+
+                {% if trade.is_open %}
+                <button class="close-trade-btn" data-trade-id="{{ trade.id }}">Close Trade</button>
+                {% endif %}
+            </div>
+
+            {% if ai_analysis %}
+            <div class="analysis-card">
+                <h2>AI Analysis</h2>
+                <div class="analysis-content">
+                    {% for analysis in ai_analysis %}
+                    <div class="analysis-item">
+                        {{ forloop.counter }}. {{ analysis }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+    new TradingView.widget({
+        "width": "100%",
+        "height": "100%",
+        "symbol": "{{ trade.ticker }}",
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "en",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "allow_symbol_change": false,
+        "container_id": "tradingview_chart"
+    });
+
+    document.querySelector('.close-trade-btn').addEventListener('click', async function () {
+        const tradeId = this.dataset.tradeId;
+        closeTrade(tradeId);
+        const button = document.querySelector(`.close-trade-btn`);
+        button.remove();
+        fetchPortfolioData();
+    });
+
+</script>
+{% endblock %}

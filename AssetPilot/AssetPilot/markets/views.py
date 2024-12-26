@@ -21,15 +21,48 @@ def markets_home_view(request):
 
         current_price = get_ticker_price(ticker)
 
-        Trade.objects.create(
+        trade = Trade.objects.create(
             user=request.user,
             ticker=ticker,
             trade_type=trade_type,
             amount=amount,
             price=current_price,
         )
+
+        return JsonResponse(
+            {
+                "status": "success",
+                "trade": {
+                    "trade_id": trade.id,
+                    "ticker": trade.ticker,
+                    "amount": trade.amount,
+                    "trade_type": trade.trade_type,
+                    "price": trade.price,
+                },
+            }
+        )
     elif request.method == "GET":
-        context = {"search_query": ticker}
+        open_trades = Trade.objects.filter(user=request.user, is_open=True)
+
+        open_trades_data = []
+        for trade in filter(lambda trade: trade.ticker == ticker, open_trades):
+            current_price = get_ticker_price(trade.ticker)
+            enter_price = float(trade.price)
+
+            profit_loss_percentage = ((current_price - enter_price) / enter_price) * 100
+
+            open_trades_data.append(
+                {
+                    "id": trade.id,
+                    "ticker": trade.ticker,
+                    "amount": trade.amount,
+                    "price": trade.price,
+                    "trade_type": trade.trade_type,
+                    "profit_loss_percentage": round(profit_loss_percentage, 2),
+                }
+            )
+
+        context = {"search_query": ticker, "open_trades_data": open_trades_data}
         return render(request, "markets/markets.html", context)
 
 

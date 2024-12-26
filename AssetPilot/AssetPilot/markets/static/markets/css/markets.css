@@ -2,19 +2,19 @@
     display: flex;
     gap: 20px;
     padding: 20px;
-    height: 80vh;
+    height: 88vh;
+    flex-wrap: wrap;
 }
 
 .left-panel {
-    flex: 3;
+    flex: 7;
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
 .right-panel {
-    flex: 1;
-    min-width: 250px;
+    flex: 3;
 }
 
 .search-container {
@@ -96,7 +96,7 @@
 
 .order-btn.active {
     opacity: 1;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .amount-input {
@@ -167,4 +167,61 @@
 .suggestion-name {
     color: #666;
     font-size: 0.9em;
+}
+
+.trades-section {
+    width: 100%;
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.trades-container {
+    max-height: 35vh;
+    overflow-y: auto;
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+.trades-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.trades-table thead {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 1;
+}
+
+.trades-table th,
+.trades-table td {
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.profit {
+    color: #4CAF50;
+}
+
+.loss {
+    color: #f44336;
+}
+
+.close-trade-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.close-trade-btn:hover {
+    background-color: #d32f2f;
 }

@@ -1,7 +1,7 @@
 body {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-height: 100vh;
     overflow: auto;
     font-family: "Open Sans", sans-serif;
     font-size: 1.2rem;
@@ -114,6 +114,7 @@ footer {
     color: white;
     transition: margin-left 0.3s ease-in-out;
     background: linear-gradient(to right, #227db2, #41bde5);
+    margin-top: auto;
 }
 
 footer.footer-expanded {

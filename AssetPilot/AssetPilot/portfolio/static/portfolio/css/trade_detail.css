@@ -1,0 +1,101 @@
+.trade-detail-container {
+    padding: 20px;
+    height: calc(100vh - 100px);
+}
+
+.trade-detail-grid {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 20px;
+    height: 100%;
+}
+
+.chart-section {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    height: 100%;
+}
+
+.tradingview-widget-container {
+    height: 100%;
+}
+
+#tradingview_chart {
+    height: 100%;
+}
+
+.trade-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.trade-info-card,
+.analysis-card,
+.actions-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.trade-info-content {
+    margin-top: 15px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-weight: 600;
+    color: #666;
+}
+
+.analysis-content {
+    margin-top: 15px;
+}
+
+.analysis-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.analysis-item:last-child {
+    border-bottom: none;
+}
+
+.close-trade-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.close-trade-btn:hover {
+    background-color: #d32f2f;
+}
+
+.profit {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.loss {
+    color: #f44336;
+    font-weight: 600;
+} 

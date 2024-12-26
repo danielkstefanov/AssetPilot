@@ -72,6 +72,20 @@
     background-color: #d32f2f;
 }
 
+.details-trade-btn {
+
+    background-color: #0085fa;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.details-trade-btn:hover {
+    background-color: #0068c3;
+}
+
 .chart-container {
     width: 100%;
     height: 500px;
