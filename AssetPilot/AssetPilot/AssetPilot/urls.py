@@ -8,6 +8,7 @@ urlpatterns = [
     path("users/", include("users.urls")),
     path("markets/", include("markets.urls")),
     path("portfolio/", include("portfolio.urls")),
+    path("news/", include("news.urls", namespace="news")),
 ]
 
 handler404 = "pages.views.error_404_view"

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'news/css/news.css' %}">
+
+<div class="news-container">
+    <div class="search-container">
+        <form method="GET" action="{% url 'news:news' %}" class="search-form">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search for news..." class="search-input">
+                <button type="submit" class="search-button">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="news-grid">
+        <div class="featured-news">
+            {% for news in featured_news %}
+            <a href="{{ news.url }}" target="_blank" class="read-more">
+                <div class="news-card featured">
+                    {% if news.image %}
+                    <div class="news-image">
+                        <img src="{{ news.image }}" alt="{{ news.headline }}">
+                    </div>
+                    {% endif %}
+                    <div class="news-content">
+                        <h3 class="news-headline">{{ news.headline }}</h3>
+                        <p class="news-description">{{ news.summary }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="regular-news">
+            {% for news in regular_news %}
+            <a href="{{ news.url }}" target="_blank" class="read-more">
+                <div class="news-card">
+                    {% if news.image %}
+                    <div class="news-image">
+                        <img src="{{ news.image }}" alt="{{ news.headline }}">
+                    </div>
+                    {% endif %}
+                    <div class="news-content">
+                        <h4 class="news-headline">{{ news.headline }}</h4>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="pagination-container">
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="pagination-link first">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                    class="pagination-link prev">Previous</a>
+                {% endif %}
+
+                <div class="pagination-numbers">
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if num == page_obj.number %}
+                    <span class="pagination-current">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a
+                        href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                        class="pagination-link">{{ num }}</a>
+                        {% endif %}
+                        {% endfor %}
+                </div>
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&query={{ search_query }}{% endif %}"
+                    class="pagination-link next">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&query={{ search_query }}{% endif %}"
+                    class="pagination-link last">Last &raquo;</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

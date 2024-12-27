@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "markets.apps.MarketsConfig",
     "portfolio.apps.PortfolioConfig",
+    "news.apps.NewsConfig",
 ]
 
 MIDDLEWARE = [
