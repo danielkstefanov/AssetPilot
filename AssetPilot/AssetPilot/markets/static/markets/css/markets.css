@@ -13,6 +13,10 @@
     gap: 20px;
 }
 
+.trades-section-closed {
+    display: none;
+}
+
 .right-panel {
     flex: 3;
 }

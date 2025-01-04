@@ -20,7 +20,7 @@ def portfolio(request):
     open_trades_data = []
     for trade in open_trades:
         current_price = get_ticker_price(trade.ticker)
-        enter_price = float(trade.price)
+        enter_price = float(trade.enter_price)
 
         profit_loss_percentage = ((current_price - enter_price) / enter_price) * 100
 
@@ -29,7 +29,8 @@ def portfolio(request):
                 "id": trade.id,
                 "ticker": trade.ticker,
                 "amount": trade.amount,
-                "price": trade.price,
+                "enter_price": trade.enter_price,
+                "current_price": current_price,
                 "trade_type": trade.trade_type,
                 "profit_loss_percentage": round(profit_loss_percentage, 2),
             }
@@ -43,12 +44,15 @@ def portfolio(request):
 @login_required
 def portfolio_data(request):
     open_trades = Trade.objects.filter(user=request.user, is_open=True)
-    total_value = sum(trade.amount * trade.price for trade in open_trades)
+    total_value = sum(
+        float(trade.amount) * float(get_ticker_price(trade.ticker))
+        for trade in open_trades
+    )
 
     allocation = {}
 
     for trade in open_trades:
-        trade_value = trade.amount * trade.price
+        trade_value = float(trade.amount) * float(get_ticker_price(trade.ticker))
         if trade.ticker not in allocation:
             allocation[trade.ticker] = 0
         allocation[trade.ticker] += trade_value / total_value * 100
@@ -70,6 +74,8 @@ def portfolio_data(request):
 @require_POST
 def close_trade(request, trade_id):
     trade = Trade.objects.get(id=trade_id, user=request.user)
+    trade.close_price = get_ticker_price(trade.ticker)
+    trade.close_date = datetime.now()
     trade.close()
 
 
@@ -78,7 +84,9 @@ def trade_detail(request, trade_id):
     trade = Trade.objects.get(id=trade_id, user=request.user)
 
     current_price = get_ticker_price(trade.ticker)
-    profit_loss = ((current_price - float(trade.price)) / float(trade.price)) * 100
+    profit_loss = (
+        (current_price - float(trade.enter_price)) / float(trade.enter_price)
+    ) * 100
 
     context = {
         "trade": trade,

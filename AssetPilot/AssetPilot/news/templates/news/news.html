@@ -18,7 +18,7 @@
     <div class="news-grid">
         <div class="featured-news">
             {% for news in featured_news %}
-            <a href="{{ news.url }}" target="_blank" class="read-more">
+            <a href="{% url 'news:news_details' news.headline %}" target="_blank" class="read-more">
                 <div class="news-card featured">
                     {% if news.image %}
                     <div class="news-image">
@@ -36,7 +36,7 @@
 
         <div class="regular-news">
             {% for news in regular_news %}
-            <a href="{{ news.url }}" target="_blank" class="read-more">
+            <a href="{% url 'news:news_details' news.headline %}" target="_blank" class="read-more">
                 <div class="news-card">
                     {% if news.image %}
                     <div class="news-image">
@@ -72,9 +72,9 @@
                 </div>
 
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&query={{ search_query }}{% endif %}"
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
                     class="pagination-link next">Next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&query={{ search_query }}{% endif %}"
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}"
                     class="pagination-link last">Last &raquo;</a>
                 {% endif %}
             </div>

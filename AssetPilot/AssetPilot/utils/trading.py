@@ -17,7 +17,7 @@ def get_ticker_price(ticker):
                 interval=Interval.INTERVAL_1_MINUTE,
             )
             analysis = handler.get_analysis()
-            return analysis.indicators["close"]
+            return float(analysis.indicators["close"])
         except:
             continue
 

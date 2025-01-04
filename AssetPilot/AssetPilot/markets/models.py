@@ -27,8 +27,10 @@ class Trade(models.Model):
     ticker = models.CharField(max_length=10)
     trade_type = models.CharField(max_length=4, choices=TRADE_TYPES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    enter_price = models.DecimalField(max_digits=10, decimal_places=2)
+    close_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    enter_date = models.DateTimeField(auto_now_add=True)
+    close_date = models.DateTimeField(null=True, blank=True)
     is_open = models.BooleanField(default=True)
 
     def close(self):

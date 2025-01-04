@@ -45,8 +45,7 @@
                 <button type="submit" class="confirm-btn">Confirm</button>
             </form>
         </div>
-        {% if open_trades_data %}
-        <div class="trades-section">
+        <div id="trades-section" class="trades-section trades-section-closed">
             <h4>Open Trades</h4>
             <div class="trades-container">
                 <table class="trades-table">
@@ -72,7 +71,7 @@
                             <td class="trade_type_td {% if trade.trade_type == 'BUY' %}profit{% else %}loss{% endif %}">
                                 {{ trade.trade_type }}
                             </td>
-                            <td>${{ trade.price }}</td>
+                            <td>${{ trade.enter_price }}</td>
                             <td class="{% if trade.profit_loss_percentage >= 0 %}profit{% else %}loss{% endif %}">
                                 {{ trade.profit_loss_percentage }}%
                             </td>
@@ -85,7 +84,6 @@
                 </table>
             </div>
         </div>
-        {% endif %}
     </div>
 </div>
 
@@ -104,6 +102,13 @@
         "save_image": false,
         "details": false,
     });
+
+
+    //  document.onload = function() {
+    //    if ("{{ open_trades_data|length }}" != "0") {
+    //      document.getElementById('trades-section').classList.remove('trades-section-closed');
+    //}
+    //}
 
 
     document.querySelectorAll('.close-trade-btn').forEach(button => {
@@ -179,19 +184,20 @@
                         <td class="trade_type_td ${data.trade.trade_type.toUpperCase() === 'BUY' ? 'profit' : 'loss'}">
                             ${data.trade.trade_type}
                         </td>
-                        <td>$${data.trade.price}</td>
+                        <td>$${data.trade.enter_price}</td>
                         <td class="profit">0.0%</td>
                         <td>
-                            <button class="close-trade-btn" data-trade-id="${data.trade.id}">Close</button>
+                            <button class="close-trade-btn" data-trade-id="${data.trade.trade_id}">Close</button>
                         </td>
                     </tr>
                 `;
 
+            document.getElementById('trades-body').classList.add('open-trades');
             document.getElementById('trades-body').insertAdjacentHTML('afterbegin', newRow);
 
-            const newCloseButton = document.querySelector(`button[data-trade-id="${data.trade_id}"]`);
+            const newCloseButton = document.querySelector(`button[data-trade-id="${data.trade.trade_id}"]`);
             newCloseButton.addEventListener('click', function () {
-                closeTrade(data.trade_id);
+                closeTrade(data.trade.trade_id);
             });
 
             this.reset();

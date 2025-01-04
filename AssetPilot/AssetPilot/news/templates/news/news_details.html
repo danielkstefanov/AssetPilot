@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'news/css/news_details.css' %}">
+
+<div class="news-details-wrapper">
+    <div class="news-card">
+        <div class="news-grid">
+            <div class="image-section">
+                {% if news.urlToImage %}
+                <img src="{{ news.urlToImage }}" alt="{{ news.title }}" class="news-image">
+                {% endif %}
+            </div>
+            <div class="content-section">
+                <h1 class="title">{{ news.title }}</h1>
+                <div class="metadata">
+                    <span>{{ news.source.name }}</span>
+                    <span>{{ news.publishedAt|date:"F j, Y" }}</span>
+                </div>
+                <p class="description">{{ news.description }}</p>
+                <p class="content">{{ news.content }}</p>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h3>AI Analysis</h3>
+            <div class="analysis-content">
+                <p>AI-powered analysis coming soon...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -34,7 +34,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="/profile" class="nav-link">
+                        <a href="{% url 'profile' %}" class="nav-link">
                             <i class="sidebar-icon fa-solid fa-user"></i> <span class="sidebar-text">Profile</span>
                         </a>
                     </li>
@@ -49,6 +49,12 @@
                     <li class="nav-item">
                         <a href="{% url 'markets-home-view' %}" class="nav-link">
                             <i class="sidebar-icon fa-solid fa-chart-line"></i> <span class="sidebar-text">Markets</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'news:news' %}" class="nav-link">
+                            <i class="sidebar-icon fa-solid fa-newspaper"></i> <span class="sidebar-text">News</span>
                         </a>
                     </li>
 

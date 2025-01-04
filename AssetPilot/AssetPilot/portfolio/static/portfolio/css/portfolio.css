@@ -96,3 +96,11 @@ canvas#portfolioChart {
     width: 100% !important;
     height: 100% !important;
 }
+
+.no-trades-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 75vh;
+}

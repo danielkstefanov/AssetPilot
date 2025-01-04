@@ -20,7 +20,7 @@ def news(request):
             stock_news = newsapi.get_everything(
                 q=f'({query_string} OR "{query_string} stock" OR "{query_string} shares")',
                 language="en",
-                sort_by="publishedAt",
+                sort_by="popularity",
             )
         else:
             stock_news = newsapi.get_top_headlines(
@@ -82,16 +82,16 @@ def news(request):
 
 
 @login_required
-def news_detail(request, news_id):
-    all_news = request.session.get("all_news", [])
-    news_item = next((item for item in all_news if item["id"] == news_id), None)
+def news_details(request, news_headline):
 
-    if not news_item:
-        return redirect("news")
-
-    news_item["datetime"] = datetime.fromisoformat(news_item["datetime"])
+    stock_news = newsapi.get_everything(
+        q=f"({news_headline})",
+        language="en",
+        sort_by="popularity",
+    )
 
     context = {
-        "news": news_item,
+        "news": stock_news.get("articles", [])[0],
     }
-    return render(request, "news/news_detail.html", context)
+    print(stock_news.get("articles", [])[0].get("description"))
+    return render(request, "news/news_details.html", context)

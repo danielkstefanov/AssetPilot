@@ -26,7 +26,7 @@ def markets_home_view(request):
             ticker=ticker,
             trade_type=trade_type,
             amount=amount,
-            price=current_price,
+            enter_price=current_price,
         )
 
         return JsonResponse(
@@ -37,7 +37,7 @@ def markets_home_view(request):
                     "ticker": trade.ticker,
                     "amount": trade.amount,
                     "trade_type": trade.trade_type,
-                    "price": trade.price,
+                    "enter_price": trade.enter_price,
                 },
             }
         )
@@ -47,7 +47,7 @@ def markets_home_view(request):
         open_trades_data = []
         for trade in filter(lambda trade: trade.ticker == ticker, open_trades):
             current_price = get_ticker_price(trade.ticker)
-            enter_price = float(trade.price)
+            enter_price = float(trade.enter_price)
 
             profit_loss_percentage = ((current_price - enter_price) / enter_price) * 100
 
@@ -56,7 +56,7 @@ def markets_home_view(request):
                     "id": trade.id,
                     "ticker": trade.ticker,
                     "amount": trade.amount,
-                    "price": trade.price,
+                    "enter_price": trade.enter_price,
                     "trade_type": trade.trade_type,
                     "profit_loss_percentage": round(profit_loss_percentage, 2),
                 }

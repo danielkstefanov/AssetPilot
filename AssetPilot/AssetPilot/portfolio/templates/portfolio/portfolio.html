@@ -8,6 +8,7 @@
 <script src="{% static 'portfolio/js/trade_utils.js' %}"></script>
 
 <div class="portfolio-container">
+    {% if open_trades_data %}
     <div class="portfolio-grid">
         <div class="chart-section">
             <h2>Portfolio Allocation</h2>
@@ -32,7 +33,8 @@
                             <th>Ticker</th>
                             <th>Amount</th>
                             <th>Trade Type</th>
-                            <th>Price</th>
+                            <th>Enter Price</th>
+                            <th>Current Price</th>
                             <th>P/L %</th>
                             <th>Action</th>
                         </tr>
@@ -48,7 +50,8 @@
                             <td class="trade_type_td {% if trade.trade_type == 'BUY' %}profit{% else %}loss{% endif %}">
                                 {{ trade.trade_type }}
                             </td>
-                            <td>${{ trade.price }}</td>
+                            <td>${{ trade.enter_price }}</td>
+                            <td>${{ trade.current_price|floatformat:2 }}</td>
                             <td class="{% if trade.profit_loss_percentage >= 0 %}profit{% else %}loss{% endif %}">
                                 {{ trade.profit_loss_percentage }}%
                             </td>
@@ -66,6 +69,11 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="no-trades-container">
+        <h2>No open trades</h2>
+    </div>
+    {% endif %}
 </div>
 
 <script>
