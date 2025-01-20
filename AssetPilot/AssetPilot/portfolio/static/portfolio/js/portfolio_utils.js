@@ -1,7 +1,7 @@
 async function closeTrade(tradeId) {
 
     if (!confirm('Are you sure you want to close this order?')) {
-        return;
+        return false;
     }
 
     await fetch(`/portfolio/close-trade/${tradeId}/`, {
@@ -10,6 +10,8 @@ async function closeTrade(tradeId) {
             'X-CSRFToken': getCookie('csrftoken'),
         },
     });
+
+    return true;
 }
 
 function getCookie(name) {

@@ -1,5 +1,6 @@
 .trading-layout {
     display: flex;
+    font-size: 0.7rem;
     gap: 20px;
     padding: 20px;
     height: 88vh;
@@ -26,7 +27,7 @@
     align-items: center;
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
 }
 
 .search-form {
@@ -36,7 +37,7 @@
 }
 
 .search-input-container{
-    width: 600px;
+    width: 30vw;
 }
 
 .search-input {
@@ -170,7 +171,6 @@
 
 .suggestion-name {
     color: #666;
-    font-size: 0.9em;
 }
 
 .trades-section {
@@ -183,10 +183,10 @@
 }
 
 .trades-container {
-    max-height: 35vh;
+    max-height: 25vh;
     overflow-y: auto;
     overflow-x: auto;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 .trades-table {

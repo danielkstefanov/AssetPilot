@@ -39,23 +39,23 @@
                 </div>
                 <div class="amount-input">
                     <label for="amount">Amount</label>
-                    <input type="number" id="amount" name="amount" step="0.1" min="0" value="1.5">
+                    <input type="number" id="amount" name="amount" step="0.01" min="0" value="1.0">
                 </div>
                 <input type="hidden" name="order_type" id="order_type" value="buy">
                 <button type="submit" class="confirm-btn">Confirm</button>
             </form>
         </div>
         <div id="trades-section" class="trades-section trades-section-closed">
-            <h4>Open Trades</h4>
+            <h5>Open Trades</h5>
             <div class="trades-container">
                 <table class="trades-table">
                     <thead>
                         <tr>
                             <th>Ticker</th>
                             <th>Amount</th>
-                            <th>Trade Type</th>
+                            <th>Order</th>
                             <th>Price</th>
-                            <th>P/L %</th>
+                            <th>P/L</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -104,11 +104,13 @@
     });
 
 
-    //  document.onload = function() {
-    //    if ("{{ open_trades_data|length }}" != "0") {
-    //      document.getElementById('trades-section').classList.remove('trades-section-closed');
-    //}
-    //}
+    document.addEventListener('DOMContentLoaded', function () {
+        var openTradesLength = {{ open_trades_data|length }};
+
+        if (openTradesLength != 0) {
+            document.getElementById('trades-section').classList.remove('trades-section-closed');
+        }
+    });
 
 
     document.querySelectorAll('.close-trade-btn').forEach(button => {
@@ -201,6 +203,7 @@
             });
 
             this.reset();
+            document.getElementById('trades-section').classList.remove('trades-section-closed');
         } else {
             alert('Error opening trade: ' + data.message);
         }

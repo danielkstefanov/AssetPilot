@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from markets.models import Watchlist
 
 
 def login_view(request):
@@ -56,7 +55,6 @@ def register_view(request):
         user = authenticate(request, username=username, email=email, password=password)
         if user:
             login(request, user)
-            Watchlist.objects.create(user=user)
             return redirect("home")
 
     return render(request, "users/register.html")

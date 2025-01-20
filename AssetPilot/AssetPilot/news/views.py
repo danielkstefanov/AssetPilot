@@ -1,10 +1,15 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from markets.models import Trade
-from datetime import datetime, timedelta
+import uuid
 import os
+
+from decimal import Decimal
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
 from newsapi import NewsApiClient
+from .models import NewsItem
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from utils.scrape import scrape_news_content
+from utils.news_analysis import analyze_sentiment
 
 newsapi = NewsApiClient(api_key=os.environ.get("NEWS_API_KEY"))
 
@@ -20,7 +25,6 @@ def news(request):
             stock_news = newsapi.get_everything(
                 q=f'({query_string} OR "{query_string} stock" OR "{query_string} shares")',
                 language="en",
-                sort_by="popularity",
             )
         else:
             stock_news = newsapi.get_top_headlines(
@@ -36,18 +40,23 @@ def news(request):
                 for field in ["urlToImage", "title", "description", "content"]
             ):
                 news_item = {
-                    "id": hash(article["url"]),
+                    "id": uuid.uuid5(
+                        uuid.NAMESPACE_DNS, str(article["url"].encode("utf-8"))
+                    ),
                     "datetime": datetime.strptime(
                         article["publishedAt"], "%Y-%m-%dT%H:%M:%SZ"
                     ),
                     "headline": article["title"],
+                    "content": None,
                     "summary": article["description"],
-                    "content": article["content"],
                     "image": article["urlToImage"],
                     "url": article["url"],
                     "source": article["source"]["name"],
                 }
                 news.append(news_item)
+
+                if not NewsItem.objects.filter(id=news_item["id"]).exists():
+                    NewsItem.objects.create(**news_item)
 
     except Exception:
         print("Error while fetching news!")
@@ -82,16 +91,32 @@ def news(request):
 
 
 @login_required
-def news_details(request, news_headline):
+def news_details(request, news_id):
 
-    stock_news = newsapi.get_everything(
-        q=f"({news_headline})",
-        language="en",
-        sort_by="popularity",
-    )
+    news_item = NewsItem.objects.filter(id=news_id).first()
+
+    if news_item.content is None:
+        new_content = scrape_news_content(news_item.url)
+        news_analize = analyze_sentiment(news_item.headline, new_content)
+
+        if new_content is not None:
+            news_item.content = new_content
+            news_item.sentiment_score = Decimal(news_analize["sentiment_score"])
+            news_item.is_positive = news_analize["is_positive"]
+            news_item.save()
 
     context = {
-        "news": stock_news.get("articles", [])[0],
+        "news": {
+            "title": news_item.headline,
+            "description": news_item.summary,
+            "content": news_item.content,
+            "urlToImage": news_item.image,
+            "url": news_item.url,
+            "source": {"name": news_item.source},
+            "publishedAt": news_item.datetime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "sentiment_score": news_item.sentiment_score,
+            "is_positive": news_item.is_positive,
+        }
     }
-    print(stock_news.get("articles", [])[0].get("description"))
+
     return render(request, "news/news_details.html", context)

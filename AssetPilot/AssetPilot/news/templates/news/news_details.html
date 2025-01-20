@@ -7,26 +7,41 @@
 <div class="news-details-wrapper">
     <div class="news-card">
         <div class="news-grid">
-            <div class="image-section">
-                {% if news.urlToImage %}
-                <img src="{{ news.urlToImage }}" alt="{{ news.title }}" class="news-image">
-                {% endif %}
+            <div class="news-info">
+                <div class="image-section">
+                    {% if news.urlToImage %}
+                    <img src="{{ news.urlToImage }}" alt="{{ news.title }}" class="news-image">
+                    {% endif %}
+                </div>
+                <div class="news-data">
+                    <a href=></a>
+                    <h1 class="title">{{ news.title }}</h1>
+                    <p class="description">{{ news.description }}</p>
+                    <div class="metadata">
+                        Source: <span>{{ news.source.name }}</span>
+                        <a href="{{ news.url }}" target="_blank" class="read-more-link">Read More</a>
+                        <span>{{ news.publishedAt|date:"F j, Y" }}</span>
+                    </div>
+                </div>
             </div>
             <div class="content-section">
-                <h1 class="title">{{ news.title }}</h1>
-                <div class="metadata">
-                    <span>{{ news.source.name }}</span>
-                    <span>{{ news.publishedAt|date:"F j, Y" }}</span>
-                </div>
-                <p class="description">{{ news.description }}</p>
                 <p class="content">{{ news.content }}</p>
             </div>
         </div>
 
-        <div class="analysis-section">
-            <h3>AI Analysis</h3>
+        <div class="ai-analysis-section">
+            <h3>AI Sentiment Analysis</h3>
             <div class="analysis-content">
-                <p>AI-powered analysis coming soon...</p>
+                <div class="sentiment-indicator">
+                    <span class="sentiment-label">Sentiment:</span>
+                    <span class="sentiment-value {% if news.is_positive %}positive{% else %}negative{% endif %}">
+                        {% if news.is_positive %}Positive{% else %}Negative{% endif %}
+                    </span>
+                </div>
+                <div class="score-indicator">
+                    <span class="score-label">Confidence Score:</span>
+                    <span class="score-value">{{ news.sentiment_score|floatformat:2 }}%</span>
+                </div>
             </div>
         </div>
     </div>

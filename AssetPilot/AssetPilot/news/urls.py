@@ -5,5 +5,5 @@ app_name = "news"
 
 urlpatterns = [
     path("", views.news, name="news"),
-    path("details/<str:news_headline>/", views.news_details, name="news_details"),
+    path("details/<uuid:news_id>/", views.news_details, name="news_details"),
 ]

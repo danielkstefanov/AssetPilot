@@ -1,22 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
-class Watchlist(models.Model):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="watchlist"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
-class WatchlistItem(models.Model):
-    watchlist = models.ForeignKey(
-        Watchlist, on_delete=models.CASCADE, related_name="items"
-    )
-    stock_symbol = models.CharField(max_length=10)
-    added_at = models.DateTimeField(auto_now_add=True)
-
-
 class Trade(models.Model):
     TRADE_TYPES = [
         ("BUY", "Buy"),

@@ -4,7 +4,7 @@
 
 .profile-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 4fr 2fr;
     grid-template-rows: auto auto;
     gap: 50px;
 }
@@ -13,7 +13,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 50px;
 }
+
+.trades-history {
+    align-content: center;
+    margin-top: 50px;
+}
+
 .profile-info p {
     margin: auto;
 }

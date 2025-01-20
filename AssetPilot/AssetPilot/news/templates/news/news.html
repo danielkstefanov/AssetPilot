@@ -18,7 +18,7 @@
     <div class="news-grid">
         <div class="featured-news">
             {% for news in featured_news %}
-            <a href="{% url 'news:news_details' news.headline %}" target="_blank" class="read-more">
+            <a href="{% url 'news:news_details' news.id %}" class="read-more" >
                 <div class="news-card featured">
                     {% if news.image %}
                     <div class="news-image">
@@ -36,7 +36,7 @@
 
         <div class="regular-news">
             {% for news in regular_news %}
-            <a href="{% url 'news:news_details' news.headline %}" target="_blank" class="read-more">
+            <a href="{% url 'news:news_details' news.id %}" class="read-more">
                 <div class="news-card">
                     {% if news.image %}
                     <div class="news-image">

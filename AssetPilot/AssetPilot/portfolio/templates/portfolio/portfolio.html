@@ -5,7 +5,7 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'portfolio/css/portfolio.css' %}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{% static 'portfolio/js/trade_utils.js' %}"></script>
+<script src="{% static 'portfolio/js/portfolio_utils.js' %}"></script>
 
 <div class="portfolio-container">
     {% if open_trades_data %}
@@ -15,10 +15,26 @@
             <div class="chart-container">
                 <canvas id="portfolioChart"></canvas>
             </div>
+            <div class="chart-legend">
+                <h2 id="portfolio-value" class="portfolio-value-text">
+
+                </h2>
+                <table class="trades-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Allocation in %</th>
+                            <th>Allocation in $</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allocation-container">
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="suggestions-section">
-            <h2>Suggestions</h2>
+            <h2>Suggestions 1</h2>
             <div id="suggestions-container">
 
             </div>
@@ -91,6 +107,9 @@
                         'rgba(255, 206, 86, 0.8)',
                         'rgba(75, 192, 192, 0.8)',
                         'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(145, 2, 140, 0.8)',
+                        'rgba(50, 143, 12, 0.8)',
                     ],
                 }]
             },
@@ -105,10 +124,11 @@
         document.querySelectorAll('.close-trade-btn').forEach(button => {
             button.addEventListener('click', async function () {
                 const tradeId = this.dataset.tradeId;
-                await closeTrade(tradeId);
-                const row = document.querySelector(`tr[data-trade-id="${tradeId}"]`);
-                row.remove();
-                fetchPortfolioData();
+                if (await closeTrade(tradeId)) {
+                    const row = document.querySelector(`tr[data-trade-id="${tradeId}"]`);
+                    row.remove();
+                    fetchPortfolioData();
+                }
             });
         });
 
@@ -117,6 +137,7 @@
                 const response = await fetch('/portfolio/data/');
                 const data = await response.json();
                 updateChart(data.allocation);
+                updateAllocations(data.allocation, data.portfolio_value, data.portfolio_return_percentage, data.portfolio_return_value);
                 updateSuggestions(data.suggestions);
             } catch (error) {
                 console.error('Error fetching portfolio data:', error);
@@ -133,6 +154,22 @@
             const container = document.getElementById('suggestions-container');
             container.innerHTML = suggestions.map(suggestion =>
                 `<div class="suggestion-item">${suggestion}</div>`
+            ).join('');
+        }
+
+        function updateAllocations(allocation, portfolio_value, portfolio_return_percentage, portfolio_return_value) {
+            const container = document.getElementById('allocation-container');
+            const portfolioValueElement = document.getElementById('portfolio-value');
+            portfolioValueElement.innerHTML = `Portfolio Information: $${portfolio_value.toFixed(2)} <br/> 
+                                               Percentage Return: <span class="${portfolio_return_percentage > 0 ? 'profit' : 'loss'}">${portfolio_return_percentage > 0 ? '+' : ''}${portfolio_return_percentage.toFixed(2)}%</span> <br/>
+                                               Value Return: <span class="${portfolio_return_percentage > 0 ? 'profit' : 'loss'}">${portfolio_return_percentage > 0 ? '+' : ''} ${portfolio_return_value.toFixed(2)}$</span>`;
+
+            container.innerHTML = allocation.map(trade =>
+                `<tr>       
+                    <td>${trade.symbol}</td>
+                    <td>${trade.percentage.toFixed(2)}%</td>
+                    <td>${trade.value.toFixed(2)}</td>
+                </tr>`  
             ).join('');
         }
     }); 
