@@ -1,16 +1,9 @@
-import finnhub
-import os
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from markets.models import Trade
 from utils.trading import get_ticker_price
-import yfinance as yf
-from datetime import datetime, timedelta
-
-FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
-finnhub_client = finnhub.Client(FINNHUB_API_KEY)
 
 
 @login_required
@@ -90,8 +83,6 @@ def portfolio_data(request):
 @require_POST
 def close_trade(request, trade_id):
     trade = Trade.objects.get(id=trade_id, user=request.user)
-    trade.close_price = get_ticker_price(trade.ticker)
-    trade.close_date = datetime.now()
     trade.close()
 
 
@@ -115,6 +106,8 @@ def trade_detail(request, trade_id):
         "profit_loss_amount": round(
             (profit_loss / 100 * float(trade.enter_price)) * float(trade.amount), 2
         ),
+        "enter_date": trade.enter_date,
+        "close_date": trade.close_date,
         "ai_analysis": [],
     }
 

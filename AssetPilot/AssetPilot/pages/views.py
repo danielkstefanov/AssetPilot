@@ -5,6 +5,8 @@ from mailjet_rest import Client
 from django.contrib.auth.decorators import login_required
 from markets.models import Trade
 from utils.trading import get_ticker_price
+import csv
+from io import StringIO, TextIOWrapper
 
 MAILJET_API_KEY = os.environ.get("MAILJET_API_KEY")
 MAILJET_API_SECRET = os.environ.get("MAILJET_API_SECRET")
@@ -83,7 +85,9 @@ def contact_us_view(request):
 
         if not request.user.is_authenticated:
             return render(
-                request, "pages/contact-us.html", {"error": "You have to be logged in!"}
+                request,
+                "pages/contact-us.html",
+                {"error": "You have to be logged in!"},
             )
 
         subject = request.POST.get("subject")
@@ -111,6 +115,24 @@ def contact_us_view(request):
                     request, "Failed to send your message. Please try again later."
                 )
 
-            return redirect("contact-us")
-
     return render(request, "pages/contact-us.html")
+
+
+@login_required
+def import_trades(request):
+    if request.method == "POST":
+        csv_file = request.FILES["csv_file"]
+        text_file = TextIOWrapper(csv_file, encoding="utf-8")
+        csv_reader = csv.DictReader(text_file)
+
+        for row in csv_reader:
+            trade = Trade.objects.create(
+                user=request.user,
+                ticker=row["SYMBOL"],
+                trade_type=row["TYPE"],
+                amount=row["AMOUNT"],
+                enter_price=row["PRICE"],
+                enter_date=row["DATETIME"],
+            )
+
+    return redirect("pages:profile")

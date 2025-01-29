@@ -63,7 +63,7 @@
                         {% for trade in open_trades_data %}
                         <tr data-trade-id="{{ trade.id }}">
                             <td>
-                                <a href="{% url 'trade_detail' trade.id %}">
+                                <a href="{% url 'portfolio:trade_detail' trade.id %}">
                                     {{ trade.ticker }}
                                 </a>
                             </td>

@@ -99,3 +99,7 @@
     color: #f44336;
     font-weight: 600;
 } 
+
+.hide-close-date {
+    display: none;
+}

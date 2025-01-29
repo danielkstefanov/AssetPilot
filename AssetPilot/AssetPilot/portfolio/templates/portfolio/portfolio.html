@@ -74,7 +74,7 @@
 
                             <td>
                                 <button class="close-trade-btn" data-trade-id="{{ trade.id }}">Close</button>
-                                <a href="{% url 'trade_detail' trade.id %}">
+                                <a href="{% url 'portfolio:trade_detail' trade.id %}">
                                     <button class="details-trade-btn">Details</button>
                                 </a>
                             </td>

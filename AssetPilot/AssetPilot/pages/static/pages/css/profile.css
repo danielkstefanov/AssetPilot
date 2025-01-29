@@ -12,20 +12,26 @@
 .profile-info {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     margin-top: 50px;
 }
 
-.trades-history {
+.account-actions {
     align-content: center;
     margin-top: 50px;
+    gap: 30px;
+}
+
+.account-actions-history{
+    display: flex;
+    gap: 30px;
 }
 
 .profile-info p {
     margin: auto;
 }
 
-.profile-info, .open-trades, .strategies, .trades-history, .closed-trades{
+.profile-info, .open-trades, .strategies, .account-actions, .closed-trades{
     background: white;
     padding: 20px;
     border-radius: 8px;
@@ -127,4 +133,76 @@ button:hover {
 
 .trade_type_td {
     font-weight: bold;
+}
+
+
+
+.action-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+    padding: 1rem;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+}
+
+.action-content {
+    padding: 1rem 0;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.file-input-wrapper {
+    position: relative;
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-label:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.fas {
+    font-size: 1rem;
 }

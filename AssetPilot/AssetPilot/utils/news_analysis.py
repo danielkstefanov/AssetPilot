@@ -5,7 +5,7 @@ tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
 model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
 
 
-def analyze_sentiment(headline: str, content: str) -> dict:
+def analyze_sentiment(headline, content):
     text = f"{headline} {content}"
     inputs = tokenizer(text, return_tensors="pt", truncation=True)
 

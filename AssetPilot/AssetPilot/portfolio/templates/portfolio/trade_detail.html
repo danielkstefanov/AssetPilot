@@ -40,6 +40,14 @@
                         <span class="value">{{ trade.amount }}</span>
                     </div>
                     <div class="info-row">
+                        <span class="label">Enter Date:</span>
+                        <span class="value">{{ trade.enter_date }}</span>
+                    </div>
+                    <div class="info-row close-date-row {% if trade.is_open %}hide-close-date{% endif %}">
+                        <span class="label">Close Date:</span>
+                        <span class="value close-date">{{ trade.close_date }}</span>
+                    </div>
+                    <div class="info-row">
                         <span class="label">Profit/Loss:</span>
                         <span class="value {% if profit_loss >= 0 %}profit{% else %}loss{% endif %}">
                             {{ profit_loss }}% {{ profit_loss_amount }}$
@@ -71,6 +79,15 @@
 <script src="https://s3.tradingview.com/tv.js"></script>
 <script>
 
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        month: 'short',   
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+    });
+
     const widget = new TradingView.widget({
         "width": "100%",
         "height": "100%",
@@ -90,7 +107,11 @@
         const tradeId = this.dataset.tradeId;
         if (await closeTrade(tradeId)) {
             const button = document.querySelector(`.close-trade-btn`);
+            const closeDateRow = document.querySelector(`.close-date-row`);
             button.remove();
+            closeDateRow.classList.remove('hide-close-date');
+            const closeDate = document.querySelector(`.close-date`);
+            closeDate.textContent = formatter.format(new Date()).replace(/\sAM/, ' a.m.').replace(/\sPM/, ' p.m.');
             fetchPortfolioData();
         }
     });

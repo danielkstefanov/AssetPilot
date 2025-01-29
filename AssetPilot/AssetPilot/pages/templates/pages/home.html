@@ -12,10 +12,10 @@
     </div>
         {% if not user.is_authenticated %}
     <div class="hero-buttons">
-        <a href="{% url 'register' %}" class="nav-link" style="margin-bottom: 10px;">
+        <a href="{% url 'users:register' %}" class="nav-link" style="margin-bottom: 10px;">
             <i class="sidebar-icon fa-solid fa-address-card"></i> <span>Get Started</span>
         </a>
-        <a href="{% url 'login' %}" class="nav-link">
+        <a href="{% url 'users:login' %}" class="nav-link">
             <i class="sidebar-icon fa-solid fa-right-to-bracket"></i> <span>Login</span>
         </a>
     </div>

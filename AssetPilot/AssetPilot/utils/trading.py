@@ -1,6 +1,6 @@
 from tradingview_ta import TA_Handler, Interval
 
-configs = [
+configurations = [
     {"exchange": "NASDAQ", "screener": "america"},
     {"exchange": "NYSE", "screener": "america"},
     {"exchange": "BINANCE", "screener": "crypto"},
@@ -8,12 +8,12 @@ configs = [
 
 
 def get_ticker_price(ticker):
-    for config in configs:
+    for configuration in configurations:
         try:
             handler = TA_Handler(
                 symbol=ticker,
-                exchange=config["exchange"],
-                screener=config["screener"],
+                exchange=configuration["exchange"],
+                screener=configuration["screener"],
                 interval=Interval.INTERVAL_1_MINUTE,
             )
             analysis = handler.get_analysis()

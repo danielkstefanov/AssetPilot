@@ -7,53 +7,86 @@
 <div class="profile-container">
     <div class="profile-grid">
         <div class="profile-info">
-            <p><strong>Profile Information</strong></p>
-            <p><strong>Name:</strong> {{ user.username }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
+            <div class="profile-info-header">
+                <h4><strong>Profile Information</strong></h4>
+                <h4><strong>Name:</strong> {{ user.username }}</h4>
+                <h4><strong>Email:</strong> {{ user.email }}</h4>
+            </div>
+
+            <div class="action-card">
+                <div class="action-header">
+                    <h4>View Closed Trading</h4>
+                </div>
+                <div class="action-content">
+                    <button id="history-btn" class="btn-primary">
+                        <i class="fas fa-history"></i>
+                        View History
+                    </button>
+                </div>
+            </div>
         </div>
-        
-        <div class="trades-history">
-            <button id="history-btn">View Trading History</button>
+
+        <div class="account-actions">
+            <div class="action-header">
+                <h4>Import trades from CSV</h4>
+            </div>
+            <div class="action-content">
+                <form method="post" enctype="multipart/form-data" action="{% url 'pages:import-trades' %}"
+                    class="upload-form">
+                    {% csrf_token %}
+                    <div class="file-input-wrapper">
+                        <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
+                        <label for="csv_file" class="file-label">
+                            <i class="fas fa-file-upload"></i>
+                            Choose File
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-upload"></i>
+                        Upload CSV
+                    </button>
+                </form>
+            </div>
         </div>
 
         <div class="open-trades">
             {% if open_trades_data %}
-                <h2>Open Trades</h2>
-                <div class="trades-container">
-                    <table class="trades-table">
-                        <thead>
-                            <tr>
-                                <th>Ticker</th>
-                                <th>Amount</th>
-                                <th>Trade Type</th>
-                                <th>Enter Price</th>
-                                <th>Current Price</th>
-                                <th>P/L %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="trades-body">
-                            {% for trade in open_trades_data %}
-                            <tr data-trade-id="{{ trade.id }}">
-    
-                                <td>
-                                    <a href="{% url 'trade_detail' trade.id %}">
-                                        {{ trade.ticker }}
-                                    </a>
-                                </td>
-                                <td>{{ trade.amount }}</td>
-                                <td class="trade_type_td {% if trade.trade_type == 'BUY' %}profit{% else %}loss{% endif %}">
-                                    {{ trade.trade_type }}
-                                </td>
-                                <td>${{ trade.enter_price }}</td>   
-                                <td>${{ trade.current_price|floatformat:2 }}</td>
-                                <td class="{% if trade.profit_loss_percentage >= 0 %}profit{% else %}loss{% endif %}">
-                                    {{ trade.profit_loss_percentage }}%
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <h2>Open Trades</h2>
+            <div class="trades-container">
+                <table class="trades-table">
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Amount</th>
+                            <th>Trade Type</th>
+                            <th>Enter Price</th>
+                            <th>Current Price</th>
+                            <th>P/L %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trades-body">
+                        {% for trade in open_trades_data %}
+                        <tr data-trade-id="{{ trade.id }}">
+
+                            <td>
+                                <a href="{% url 'portfolio:trade_detail' trade.id %}">
+                                    {{ trade.ticker }}
+                                </a>
+                            </td>
+                            <td>{{ trade.amount }}</td>
+                            <td class="trade_type_td {% if trade.trade_type == 'BUY' %}profit{% else %}loss{% endif %}">
+                                {{ trade.trade_type }}
+                            </td>
+                            <td>${{ trade.enter_price }}</td>
+                            <td>${{ trade.current_price|floatformat:2 }}</td>
+                            <td class="{% if trade.profit_loss_percentage >= 0 %}profit{% else %}loss{% endif %}">
+                                {{ trade.profit_loss_percentage }}%
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             {% else %}
             <div class="no-trades-container">
                 <h2>No open trades</h2>
@@ -70,7 +103,7 @@
             </ul>
         </div>
 
-        
+
     </div>
 </div>
 
@@ -79,41 +112,41 @@
         <span class="close">&times;</span>
         <h2>Closed Trades</h2>
         {% if closed_trades_data %}
-            <div class="trades-container">
-                <table class="trades-table">
-                    <thead>
-                        <tr>
-                            <th>Ticker</th>
-                            <th>Amount</th>
-                            <th>Trade Type</th>
-                            <th>Enter Price</th>
-                            <th>Close Price</th>
-                            <th>P/L %</th>
-                        </tr>
-                    </thead>
-                    <tbody id="trades-body">
-                        {% for trade in closed_trades_data %}
-                        <tr data-trade-id="{{ trade.id }}">
+        <div class="trades-container">
+            <table class="trades-table">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Amount</th>
+                        <th>Trade Type</th>
+                        <th>Enter Price</th>
+                        <th>Close Price</th>
+                        <th>P/L %</th>
+                    </tr>
+                </thead>
+                <tbody id="trades-body">
+                    {% for trade in closed_trades_data %}
+                    <tr data-trade-id="{{ trade.id }}">
 
-                            <td>
-                                <a href="{% url 'trade_detail' trade.id %}">
-                                    {{ trade.ticker }}
-                                </a>
-                            </td>
-                            <td>{{ trade.amount }}</td>
-                            <td class="trade_type_td {% if trade.trade_type == 'BUY' %}profit{% else %}loss{% endif %}">
-                                {{ trade.trade_type }}
-                            </td>
-                            <td>${{ trade.enter_price }}</td>   
-                            <td>${{ trade.close_price|floatformat:2 }}</td>
-                            <td class="{% if trade.profit_loss_percentage >= 0 %}profit{% else %}loss{% endif %}">
-                                {{ trade.profit_loss_percentage }}%
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        <td>
+                            <a href="{% url 'portfolio:trade_detail' trade.id %}">
+                                {{ trade.ticker }}
+                            </a>
+                        </td>
+                        <td>{{ trade.amount }}</td>
+                        <td class="trade_type_td {% if trade.trade_type == 'BUY' %}profit{% else %}loss{% endif %}">
+                            {{ trade.trade_type }}
+                        </td>
+                        <td>${{ trade.enter_price }}</td>
+                        <td>${{ trade.close_price|floatformat:2 }}</td>
+                        <td class="{% if trade.profit_loss_percentage >= 0 %}profit{% else %}loss{% endif %}">
+                            {{ trade.profit_loss_percentage }}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
         <div class="no-trades-container">
             <h2>No closed trades</h2>
@@ -123,21 +156,21 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById("history-modal");
-    const btn = document.getElementById("history-btn");
-    const span = document.getElementsByClassName("close")[0];
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById("history-modal");
+        const btn = document.getElementById("history-btn");
+        const span = document.getElementsByClassName("close")[0];
 
-    btn.onclick = function() {
-        modal.style.display = "block";
-    }
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
 
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
 
-    window.onclick = function(event) {
-        if (event.target == modal) {
+        window.onclick = function (event) {
+            if (event.target == modal) {
                 modal.style.display = "none";
             }
         }

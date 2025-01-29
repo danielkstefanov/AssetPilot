@@ -1,10 +1,11 @@
 import os
 import finnhub
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Trade
 from utils.trading import get_ticker_price
+from datetime import datetime
 
 
 FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
@@ -27,6 +28,7 @@ def markets_home_view(request):
             trade_type=trade_type,
             amount=amount,
             enter_price=current_price,
+            enter_date=datetime.now(),
         )
 
         return JsonResponse(
@@ -38,6 +40,7 @@ def markets_home_view(request):
                     "amount": trade.amount,
                     "trade_type": trade.trade_type,
                     "enter_price": trade.enter_price,
+                    "enter_date": trade.enter_date,
                 },
             }
         )
@@ -46,7 +49,11 @@ def markets_home_view(request):
 
         open_trades_data = []
         for trade in filter(lambda trade: trade.ticker == ticker, open_trades):
-            current_price = get_ticker_price(trade.ticker)
+            try:
+                current_price = get_ticker_price(trade.ticker)
+            except:
+                return redirect("markets_home")
+
             enter_price = float(trade.enter_price)
 
             profit_loss_percentage = ((current_price - enter_price) / enter_price) * 100

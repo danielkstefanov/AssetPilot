@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect("/")
+        return redirect("pages:home")
 
     if request.method == "POST":
         username = request.POST["username"]
@@ -14,7 +14,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return redirect("/")
+            return redirect("pages:home")
         else:
             return render(
                 request, "users/login.html", {"error": "Invalid username or password"}
@@ -25,7 +25,7 @@ def login_view(request):
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect("/")
+        return redirect("pages:home")
 
     if request.method == "POST":
         username = request.POST["username"]
@@ -55,7 +55,7 @@ def register_view(request):
         user = authenticate(request, username=username, email=email, password=password)
         if user:
             login(request, user)
-            return redirect("home")
+            return redirect("pages:home")
 
     return render(request, "users/register.html")
 
@@ -63,4 +63,4 @@ def register_view(request):
 @login_required
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("users:login")

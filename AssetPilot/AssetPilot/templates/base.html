@@ -33,21 +33,20 @@
                             <i class="sidebar-icon fa-solid fa-house"></i> <span class="sidebar-text">Home</span>
                         </a>
                     </li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a href="{% url 'profile' %}" class="nav-link">
+                        <a href="{% url 'pages:profile' %}" class="nav-link">
                             <i class="sidebar-icon fa-solid fa-user"></i> <span class="sidebar-text">Profile</span>
                         </a>
                     </li>
-                    {% if user.is_authenticated %}
-
                     <li class="nav-item">
-                        <a href="{% url 'portfolio' %}" class="nav-link">
+                        <a href="{% url 'portfolio:portfolio' %}" class="nav-link">
                             <i class="sidebar-icon fa-solid fa-briefcase"></i> <span class="sidebar-text">Portfolio</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{% url 'markets-home-view' %}" class="nav-link">
+                        <a href="{% url 'markets:markets-home-view' %}" class="nav-link">
                             <i class="sidebar-icon fa-solid fa-chart-line"></i> <span class="sidebar-text">Markets</span>
                         </a>
                     </li>
@@ -59,18 +58,18 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="{% url 'logout' %}" class="nav-link">
+                        <a href="{% url 'users:logout' %}" class="nav-link">
                             <i class="sidebar-icon fa-solid fa-right-from-bracket"></i> <span class="sidebar-text">Logout</span>
                         </a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a href="{% url 'login' %}" class="nav-link">
+                        <a href="{% url 'users:login' %}" class="nav-link">
                             <i class="sidebar-icon fa-solid fa-right-to-bracket"></i> <span class="sidebar-text">Login</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{% url 'register' %}" class="nav-link">
+                        <a href="{% url 'users:register' %}" class="nav-link">
                             <i class="sidebar-icon fa-solid fa-address-card"></i> <span class="sidebar-text">Register</span>
                         </a>
                     </li>
@@ -86,7 +85,7 @@
         
         <footer id="footer">
             <p>&copy; 2024 AssetPilot. All Rights Reserved. | <a style="text-decoration: underline;"
-                    href="{% url 'contact-us' %}">Contact Us</a>
+                    href="{% url 'pages:contact-us' %}">Contact Us</a>
             </p>
         </footer>
     </div>
