@@ -33,19 +33,24 @@ def register_view(request):
         password = request.POST["password"]
         confirm_password = request.POST["confirm_password"]
 
-        if password != confirm_password:
-            return render(
-                request, "users/register.html", {"error": "Passwords do not match"}
-            )
-
         if User.objects.filter(username=username).exists():
             return render(
-                request, "users/register.html", {"error": "Username already exists"}
+                request, "users/register.html", {"error": "Username already exists!"}
             )
 
         if User.objects.filter(email=email).exists():
             return render(
-                request, "users/register.html", {"error": "Email already exists"}
+                request, "users/register.html", {"error": "Email already exists!"}
+            )
+        
+        if password != confirm_password:
+            return render(
+                request, "users/register.html", {"error": "Passwords do not match!"}
+            )
+            
+        if len(password) < 8:
+            return render(
+                request, "users/register.html", {"error": "Password must be at least 8 symbols long!"}
             )
 
         user = User.objects.create_user(

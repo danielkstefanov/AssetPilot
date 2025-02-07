@@ -11,6 +11,7 @@ from io import StringIO, TextIOWrapper
 MAILJET_API_KEY = os.environ.get("MAILJET_API_KEY")
 MAILJET_API_SECRET = os.environ.get("MAILJET_API_SECRET")
 MAILJET_EMAIL = os.environ.get("MAILJET_EMAIL")
+mailjet = Client(auth=(MAILJET_API_KEY, MAILJET_API_SECRET), version="v3.1")
 
 
 def error_404_view(request, exception):
@@ -80,40 +81,27 @@ def profile(request):
     return render(request, "pages/profile.html", context)
 
 
+@login_required
 def contact_us_view(request):
     if request.method == "POST":
-
-        if not request.user.is_authenticated:
-            return render(
-                request,
-                "pages/contact-us.html",
-                {"error": "You have to be logged in!"},
-            )
 
         subject = request.POST.get("subject")
         message = request.POST.get("message")
         user_email = request.user.email
 
         if subject and message:
-            mailjet = Client(auth=(MAILJET_API_KEY, MAILJET_API_SECRET), version="v3.1")
-            data = {
-                "Messages": [
-                    {
-                        "From": {"Email": MAILJET_EMAIL, "Name": "Asset Pilot"},
-                        "To": [{"Email": MAILJET_EMAIL, "Name": "Support Team"}],
-                        "Subject": subject,
-                        "TextPart": f"Message from {user_email}:\n\n{message}",
-                    }
-                ]
-            }
-            result = mailjet.send.create(data=data)
-
-            if result.status_code == 200:
-                messages.success(request, "Your message has been sent successfully!")
-            else:
-                messages.error(
-                    request, "Failed to send your message. Please try again later."
-                )
+            mailjet.send.create(
+                data={
+                    "Messages": [
+                        {
+                            "From": {"Email": user_email, "Name": "Asset Pilot"},
+                            "To": [{"Email": MAILJET_EMAIL, "Name": "Support Team"}],
+                            "Subject": subject,
+                            "TextPart": f"Message from {user_email}:\n\n{message}",
+                        }
+                    ]
+                }
+            )
 
     return render(request, "pages/contact-us.html")
 
@@ -126,7 +114,7 @@ def import_trades(request):
         csv_reader = csv.DictReader(text_file)
 
         for row in csv_reader:
-            trade = Trade.objects.create(
+            Trade.objects.create(
                 user=request.user,
                 ticker=row["SYMBOL"],
                 trade_type=row["TYPE"],
