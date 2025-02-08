@@ -117,3 +117,8 @@ canvas#portfolioChart {
     margin-top: 20px;
     margin-bottom: 75vh;
 }
+
+.suggestion-item {
+    margin-bottom: 10px;
+    font-size: 1.0rem;
+}

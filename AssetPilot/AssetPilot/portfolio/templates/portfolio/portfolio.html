@@ -34,10 +34,21 @@
         </div>
 
         <div class="suggestions-section">
-            <h2>Suggestions 1</h2>
-            <div id="suggestions-container">
+            <h2>Suggestions</h2>
 
-            </div>
+            <div class="suggestions-container">
+                <h4>Our Suggestions</h4>
+
+                <div id="our-suggestions-container">
+
+                </div>
+
+                <h4>AI Suggestions</h4>
+                
+                <div class="ai-suggestions-container">
+    
+                </div>  
+            </div> 
         </div>
 
         <div class="trades-section">
@@ -151,11 +162,19 @@
         }
 
         function updateSuggestions(suggestions) {
-            const container = document.getElementById('suggestions-container');
-            container.innerHTML = suggestions.map(suggestion =>
+            const container = document.getElementById('our-suggestions-container');
+            const aiContainer = document.getElementById('ai-suggestions-container');
+
+            container.innerHTML = suggestions.our_suggestions.map(suggestion =>
+                `<div class="suggestion-item">${suggestion}</div>`
+            ).join('');
+
+            aiContainer.innerHTML = suggestions.ai_suggestions.map(suggestion =>
                 `<div class="suggestion-item">${suggestion}</div>`
             ).join('');
         }
+
+
 
         function updateAllocations(allocation, portfolio_value, portfolio_return_percentage, portfolio_return_value) {
             const container = document.getElementById('allocation-container');
