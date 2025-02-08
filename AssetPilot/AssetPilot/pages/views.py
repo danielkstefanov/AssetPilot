@@ -6,16 +6,12 @@ from django.contrib.auth.decorators import login_required
 from markets.models import Trade
 from utils.trading import get_ticker_price
 import csv
-from io import StringIO, TextIOWrapper
+from io import TextIOWrapper
 
 MAILJET_API_KEY = os.environ.get("MAILJET_API_KEY")
 MAILJET_API_SECRET = os.environ.get("MAILJET_API_SECRET")
 MAILJET_EMAIL = os.environ.get("MAILJET_EMAIL")
 mailjet = Client(auth=(MAILJET_API_KEY, MAILJET_API_SECRET), version="v3.1")
-
-
-def error_404_view(request, exception):
-    return render(request, "404.html", status=404)
 
 
 def home_view(request):

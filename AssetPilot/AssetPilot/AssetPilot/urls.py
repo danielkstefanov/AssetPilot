@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.urls import path, include
-from pages.views import error_404_view
 
 urlpatterns = [
     path("", include("pages.urls")),
@@ -10,5 +9,3 @@ urlpatterns = [
     path("portfolio/", include("portfolio.urls")),
     path("news/", include("news.urls", namespace="news")),
 ]
-
-handler404 = "pages.views.error_404_view"
