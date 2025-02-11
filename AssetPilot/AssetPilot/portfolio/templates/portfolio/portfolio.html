@@ -45,7 +45,7 @@
 
                 <h4>AI Suggestions</h4>
                 
-                <div class="ai-suggestions-container">
+                <div id="ai-suggestions-container">
     
                 </div>  
             </div> 
@@ -167,11 +167,11 @@
 
             container.innerHTML = suggestions.our_suggestions.map(suggestion =>
                 `<div class="suggestion-item">${suggestion}</div>`
-            ).join('');
+            ).join(' ');
 
-            aiContainer.innerHTML = suggestions.ai_suggestions.map(suggestion =>
-                `<div class="suggestion-item">${suggestion}</div>`
-            ).join('');
+            aiContainer.innerHTML = suggestions.ai_suggestions.map((suggestion, index) =>
+                `<div class="suggestion-item">${index+1}. ${suggestion.title} <br/> ${suggestion.details}</div>`
+            ).join('\n');
         }
 
 

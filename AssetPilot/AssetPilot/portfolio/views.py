@@ -1,10 +1,30 @@
+from openai import OpenAI
+import os
+import json
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+
 from markets.models import Trade
 from utils.trading import get_ticker_price, get_pe_ratio, get_rsi
 
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+SYSTEM_EXPLANATION = """You are a portfolio manager. You will receive information about 
+                        the portfolio with the stocks and their allocation in it. You need 
+                        to suggest changes to the portfolio based on well established financial
+                        principles. You need to explain it understandaly for a person without
+                        any financial background. Please provide exactly 5 suggestions. Return only a valid JSON in the following format:
+                        {{
+                            "suggestions": [
+                                {{
+                                    "title": "Brief title",
+                                    "details": "Detailed explanation"
+                                }}
+                            ]
+                        }}"""
 
 SUGGESTIONS_EXPLANATIONS = [
     {
@@ -68,28 +88,34 @@ def portfolio(request):
 @login_required
 def portfolio_data(request):
     open_trades = Trade.objects.filter(user=request.user, is_open=True)
-    total_value = sum(
-        float(trade.amount) * float(get_ticker_price(trade.ticker))
-        for trade in open_trades
-    )
-
+    total_value = 0
     allocation = {}
     protfolio_original_size = 0
-
+    
     for trade in open_trades:
-        trade_value = float(trade.amount) * float(get_ticker_price(trade.ticker))
+        current_price = get_ticker_price(trade.ticker)
+
+        if trade.trade_type == "BUY":
+            trade_value = float(trade.amount) * float(current_price)
+        else:
+            initial_value = float(trade.amount) * float(trade.enter_price)
+            current_value = float(trade.amount) * float(current_price)
+            trade_value = initial_value - (current_value - initial_value)
+            
+        total_value += trade_value
         protfolio_original_size += float(trade.amount) * float(trade.enter_price)
+        
         if trade.ticker not in allocation:
             allocation[trade.ticker] = 0
-        allocation[trade.ticker] += trade_value / total_value * 100
+        allocation[trade.ticker] += trade_value
 
     allocation_data = [
         {
             "symbol": ticker,
-            "percentage": percentage,
-            "value": (percentage / 100) * total_value,
+            "percentage": value / total_value * 100,
+            "value": value,
         }
-        for ticker, percentage in allocation.items()
+        for ticker, value in allocation.items()
     ]
 
     suggestions = create_suggestions(allocation)
@@ -114,6 +140,38 @@ def create_suggestions(allocation):
         "ai_suggestions": [],
     }
 
+    suggestions["our_suggestions"] = get_our_suggestions(allocation)
+    suggestions["ai_suggestions"] = get_ai_suggestions(allocation)
+
+    return suggestions
+
+
+def get_ai_suggestions(allocation):
+
+    prompt = f"The allocation of the portfolio is: {", ".join([f"{ticker}: {percentage}%" for ticker, percentage in allocation.items()])}"
+
+    try:
+        completion = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_EXPLANATION},
+                {"role": "user", "content": prompt},
+            ],
+        )
+        
+        response_text = completion.choices[0].message.content
+        response_json = json.loads(response_text)
+        return response_json['suggestions']
+    except Exception as e:
+        print(e)
+
+    return []
+
+
+def get_our_suggestions(allocation):
+
+    our_suggestions = []
+
     for suggestion in SUGGESTIONS_EXPLANATIONS:
         current_suggestion = suggestion["text"]
         to_add = False
@@ -122,7 +180,10 @@ def create_suggestions(allocation):
             pe_ratio = get_pe_ratio(ticker)
             rsi_value = get_rsi(ticker)
 
-            value_to_compare = {
+            if (pe_ratio is None and suggestion["indicator"] == "pe_ratio") or (rsi_value is None and suggestion["indicator"] == "rsi"):
+                continue
+
+            value_to_compare = {    
                 "allocation": percentage,
                 "pe_ratio": pe_ratio,
                 "rsi": rsi_value,
@@ -137,9 +198,9 @@ def create_suggestions(allocation):
                 to_add = True
 
         if to_add:
-            suggestions["our_suggestions"].append(current_suggestion[:-2])
+            our_suggestions.append(current_suggestion[:-2])
 
-    return suggestions
+    return our_suggestions
 
 
 def follows_suggestion(value_to_compare, to_use_less_comparator, value):
@@ -152,8 +213,18 @@ def follows_suggestion(value_to_compare, to_use_less_comparator, value):
 @login_required
 @require_POST
 def close_trade(request, trade_id):
-    trade = Trade.objects.get(id=trade_id, user=request.user)
-    trade.close()
+    try:
+        trade = Trade.objects.get(id=trade_id, user=request.user)
+        trade.close()
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Trade closed successfully'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
 
 
 @login_required
