@@ -84,7 +84,6 @@
                             </td>
 
                             <td>
-                                <button class="close-trade-btn" data-trade-id="{{ trade.id }}">Close</button>
                                 <a href="{% url 'portfolio:trade_detail' trade.id %}">
                                     <button class="details-trade-btn">Details</button>
                                 </a>
@@ -131,17 +130,6 @@
         });
 
         fetchPortfolioData();
-
-        document.querySelectorAll('.close-trade-btn').forEach(button => {
-            button.addEventListener('click', async function () {
-                const tradeId = this.dataset.tradeId;
-                if (await closeTrade(tradeId)) {
-                    const row = document.querySelector(`tr[data-trade-id="${tradeId}"]`);
-                    row.remove();
-                    fetchPortfolioData();
-                }
-            });
-        });
 
         async function fetchPortfolioData() {
             try {

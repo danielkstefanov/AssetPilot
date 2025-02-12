@@ -3,10 +3,11 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from mailjet_rest import Client
 from django.contrib.auth.decorators import login_required
-from markets.models import Trade
+from markets.models import Trade, Strategy
 from utils.trading import get_ticker_price
 import csv
 from io import TextIOWrapper
+from django.http import JsonResponse
 
 MAILJET_API_KEY = os.environ.get("MAILJET_API_KEY")
 MAILJET_API_SECRET = os.environ.get("MAILJET_API_SECRET")
@@ -22,6 +23,7 @@ def home_view(request):
 def profile(request):
     open_trades = Trade.objects.filter(user=request.user, is_open=True)
     trade_history = Trade.objects.filter(user=request.user, is_open=False)
+    strategies = Strategy.objects.filter(creator=request.user)
 
     open_trades_data = []
     for trade in open_trades:
@@ -60,12 +62,6 @@ def profile(request):
                 "profit_loss_percentage": round(profit_loss_percentage, 2),
             }
         )
-
-    strategies = [
-        {"name": "Standard Deviation Strategy"},
-        {"name": "Moving Average Strategy"},
-        {"name": "Bullish Crypto Strategy"},
-    ]
 
     context = {
         "user": request.user,
@@ -117,6 +113,7 @@ def import_trades(request):
                 amount=row["AMOUNT"],
                 enter_price=row["PRICE"],
                 enter_date=row["DATETIME"],
+                strategy=None,
             )
 
     return redirect("pages:profile")

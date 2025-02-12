@@ -59,18 +59,12 @@
                 {% endif %}
             </div>
 
-            {% if ai_analysis %}
             <div class="analysis-card">
                 <h2>AI Analysis</h2>
                 <div class="analysis-content">
-                    {% for analysis in ai_analysis %}
-                    <div class="analysis-item">
-                        {{ forloop.counter }}. {{ analysis }}
-                    </div>
-                    {% endfor %}
+                    <p class="analysis-text">{{ ai_analysis }}</p>
                 </div>
             </div>
-            {% endif %}
         </div>
     </div>
 </div>

@@ -33,7 +33,6 @@
 }
 
 .trade-info-card,
-.analysis-card,
 .actions-card {
     background: white;
     border-radius: 8px;
@@ -59,19 +58,6 @@
 .label {
     font-weight: 600;
     color: #666;
-}
-
-.analysis-content {
-    margin-top: 15px;
-}
-
-.analysis-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.analysis-item:last-child {
-    border-bottom: none;
 }
 
 .close-trade-btn {
@@ -102,4 +88,23 @@
 
 .hide-close-date {
     display: none;
+}
+
+.analysis-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 10px;
+}
+
+.analysis-content {
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.analysis-text {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.8rem;
+    line-height: 1.5;
 }

@@ -2,6 +2,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    margin: 0;
     overflow: auto;
     font-family: "Open Sans", sans-serif;
     font-size: 0.8rem;
@@ -48,7 +49,7 @@ html {
 }
 
 .content {
-    flex: 1;
+    flex: 1 0 auto;
     margin-left: 90px;
     padding: 20px;
     transition: margin-left 0.3s ease-in-out;
@@ -106,15 +107,16 @@ html {
 }
 
 footer {
+    flex-shrink: 0;
+    padding: 1rem;
+    margin-top: auto;
     text-align: center;
-    padding: 20px;
     margin-left: 10%;
     margin-right: 5%;
     border-radius: 20px;
     color: white;
     transition: margin-left 0.3s ease-in-out;
     background: linear-gradient(to right, #227db2, #41bde5);
-    margin-top: auto;
 }
 
 footer.footer-expanded {

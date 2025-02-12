@@ -7,52 +7,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
+from portfolio.constants import SUGGESTIONS_EXPLANATIONS, SYSTEM_EXPLANATION_FOR_PORTFOLIO_ANALYSIS, SYSTEM_EXPLANATION_FOR_TRADE_ANALYSIS
 from markets.models import Trade
 from utils.trading import get_ticker_price, get_pe_ratio, get_rsi
 
 openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
-SYSTEM_EXPLANATION = """You are a portfolio manager. You will receive information about 
-                        the portfolio with the stocks and their allocation in it. You need 
-                        to suggest changes to the portfolio based on well established financial
-                        principles. You need to explain it understandaly for a person without
-                        any financial background. Please provide exactly 5 suggestions. Return only a valid JSON in the following format:
-                        {{
-                            "suggestions": [
-                                {{
-                                    "title": "Brief title",
-                                    "details": "Detailed explanation"
-                                }}
-                            ]
-                        }}"""
-
-SUGGESTIONS_EXPLANATIONS = [
-    {
-        "text": "Based on financial principles, you should diversify your portfolio. You should think about the allocation that you have in: ",
-        "indicator": "allocation",
-        "to_use_less_comparator": False,
-        "value": 20,
-    },
-    {
-        "text": "It is normal for a stock to have a P/E ratio of 15-20. If a stock has a P/E ratio of 20 or more, it is overvalued and you should consider selling it. In your portfolio, the following stocks doesn't follow this principle: ",
-        "indicator": "pe_ratio",
-        "to_use_less_comparator": False,
-        "value": 20,
-    },
-    {
-        "text": "If a stock has an RSI of 70 or more, it is overvalued and you should consider selling it. In your portfolio, the following stocks doesn't follow this principle: ",
-        "indicator": "rsi",
-        "to_use_less_comparator": False,
-        "value": 70,
-    },
-    {
-        "text": "If a stock has an RSI of 30 or less, it is undervalued and you should consider buying it. In your portfolio, the following stocks are considered undervalued: ",
-        "indicator": "rsi",
-        "to_use_less_comparator": True,
-        "value": 30,
-    },
-]
-
 
 @login_required
 def portfolio(request):
@@ -152,7 +111,7 @@ def get_ai_suggestions(allocation):
         completion = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": SYSTEM_EXPLANATION},
+                {"role": "system", "content": SYSTEM_EXPLANATION_FOR_PORTFOLIO_ANALYSIS},
                 {"role": "user", "content": prompt},
             ],
         )
@@ -250,11 +209,27 @@ def trade_detail(request, trade_id):
         ),
         "enter_date": trade.enter_date,
         "close_date": trade.close_date,
-        "ai_analysis": [],
+        "ai_analysis": ai_analysis_for_trade(trade),
     }
 
     return render(request, "portfolio/trade_detail.html", context)
 
+
+def ai_analysis_for_trade(trade):
+
+    prompt = f"The trade is: {trade.ticker} {trade.trade_type} {trade.amount} at {trade.enter_price} on {trade.enter_date}"
+    completion = openai_client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM_EXPLANATION_FOR_TRADE_ANALYSIS},
+            {"role": "user", "content": prompt},
+        ],
+    )   
+
+    response_text = completion.choices[0].message.content
+    response_json = json.loads(response_text)
+    
+    return response_json['explanation'] + "\n" + response_json['suggestion']
 
 @login_required
 def get_trade_strategy(request, trade_id):
