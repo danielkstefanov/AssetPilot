@@ -3,7 +3,6 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'portfolio/css/trade_detail.css' %}">
-<script src="{% static 'portfolio/js/portfolio_utils.js' %}"></script>
 
 <div class="trade-detail-container">
     <div class="trade-detail-grid">
@@ -56,7 +55,7 @@
                 </div>
 
                 {% if trade.is_open %}
-                <button class="close-trade-btn" data-trade-id="{{ trade.id }}">Close Trade</button>
+                <button id="close-trade-btn" class="close-trade-btn" data-trade-id="{{ trade.id }}">Close Trade</button>
                 {% endif %}
             </div>
 
@@ -80,7 +79,7 @@
 <script>
 
     const formatter = new Intl.DateTimeFormat('en-US', {
-        month: 'short',   
+        month: 'short',
         day: 'numeric',
         year: 'numeric',
         hour: 'numeric',
@@ -103,8 +102,18 @@
         "container_id": "tradingview_chart"
     });
 
-    document.querySelector('.close-trade-btn').addEventListener('click', async function () {
+    document.getElementById('close-trade-btn').addEventListener('click', async function () {
         const tradeId = this.dataset.tradeId;
+        const strategy = await getTradeStrategy(tradeId);
+
+        if (strategy && !confirm("This trade is based on the strategy: " + "\n" + strategy.title + "\n" + "Exit condition explanation: "+ "\n" + strategy.trade_exit_explanation)) {
+            return;
+        }
+        
+        if (!strategy && !confirm('Are you sure you want to close this order?')) {
+            return;
+        }
+
         if (await closeTrade(tradeId)) {
             const button = document.querySelector(`.close-trade-btn`);
             const closeDateRow = document.querySelector(`.close-date-row`);
@@ -116,5 +125,43 @@
         }
     });
 
+    async function closeTrade(tradeId) {
+        await fetch(`/portfolio/close-trade/${tradeId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        });
+
+        return true;
+    }
+
+    async function getTradeStrategy(tradeId) {
+        const response = await fetch(`/portfolio/get-trade-strategy/${tradeId}/`);
+        const data = await response.json();
+        const strategy = data.strategy;
+
+        if (data.status === 'success' && strategy != null) {
+            return strategy;
+        }
+
+        return null;
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
 </script>
 {% endblock %}

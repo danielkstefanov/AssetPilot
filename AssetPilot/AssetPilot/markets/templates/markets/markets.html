@@ -7,6 +7,33 @@
 <link rel="stylesheet" href="{% static 'markets/css/markets.css' %}">
 
 <div class="trading-layout">
+
+    <div id="strategyFormPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <h2>Create New Strategy</h2>
+            <form id="strategyForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="title">Strategy Title:</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="enter_position">Enter Position Explanation:</label>
+                    <textarea id="enter_position" name="enter_position_explanation" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="trade_exit">Trade Exit Explanation:</label>
+                    <textarea id="trade_exit" name="trade_exit_explanation" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" id="create-strategy-confirm-btn" class="create-strategy-confirm-btn">Create Strategy</button>
+                    <button type="button" id="create-strategy-cancel-btn" class="create-strategy-cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <div class="left-panel">
         <div class="search-container">
             <form method="GET" class="search-form">
@@ -27,8 +54,13 @@
             <div class="strategy-selector">
                 <span>using strategy</span>
                 <select name="strategy" id="strategy">
-                    <option value="add">add strategy</option>
+                    <option value="default">no strategy</option>
+                    {% for strategy in strategies %}
+                        <option value="{{ strategy.id }}">{{ strategy.title }}</option>
+                    {% endfor %}
                 </select>
+
+                <button id="add-strategy-btn" class="add-strategy-btn">Add strategy</button>
             </div>
 
             <form method="POST" class="order-form">
@@ -105,13 +137,63 @@
 
 
     document.addEventListener('DOMContentLoaded', function () {
-        var openTradesLength = {{ open_trades_data|length }};
+        var openTradesLength = {{ open_trades_data | length }};
 
         if (openTradesLength != 0) {
             document.getElementById('trades-section').classList.remove('trades-section-closed');
         }
-    });
 
+        const addStrategyBtn = document.getElementById('add-strategy-btn');
+        const popup = document.getElementById('strategyFormPopup');
+        const strategyForm = document.getElementById('strategyForm');
+        const cancelBtn = document.getElementById('create-strategy-cancel-btn');
+
+        addStrategyBtn.addEventListener('click', function () {
+            popup.style.display = 'flex';
+        });
+
+        cancelBtn.addEventListener('click', function () {
+            popup.style.display = 'none';
+            strategyForm.reset();
+        });
+
+        strategyForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const formData = new FormData(strategyForm);
+
+            const formDataObject = {};
+            formData.forEach((value, key) => {
+                formDataObject[key] = value;
+            });
+
+            try {
+                const response = await fetch('/markets/create-strategy/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': formDataObject['csrfmiddlewaretoken']
+                    },
+                    body: JSON.stringify(formDataObject)
+                });
+
+                if (response.ok) {
+                    const strategy = await response.json();
+                    const dropdown = document.getElementById('strategy');
+                    const option = document.createElement('option');
+                    option.value = strategy.id;
+                    option.textContent = strategy.title;
+                    dropdown.appendChild(option);
+
+                    popup.style.display = 'none';
+                    strategyForm.reset();
+                } else {
+                    console.error('Failed to create strategy');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    });
 
     document.querySelectorAll('.close-trade-btn').forEach(button => {
         button.addEventListener('click', function () {
@@ -121,6 +203,17 @@
     });
 
     async function closeTrade(tradeId) {
+
+        const strategy = await getTradeStrategy(tradeId);
+
+        if (strategy && !confirm("This trade is based on the strategy: " + "\n" + strategy.title + "\n" + "Exit condition explanation: "+ "\n" + strategy.trade_exit_explanation)) {
+            return;
+        }
+        
+        if (!strategy && !confirm('Are you sure you want to close this order?')) {
+            return;
+        }
+
         await fetch(`/portfolio/close-trade/${tradeId}/`, {
             method: 'POST',
             headers: {
@@ -129,6 +222,18 @@
         });
         const row = document.querySelector(`tr[data-trade-id="${tradeId}"]`);
         row.remove();
+    }
+
+    async function getTradeStrategy(tradeId) {
+        const response = await fetch(`/portfolio/get-trade-strategy/${tradeId}/`);
+        const data = await response.json();
+        const strategy = data.strategy;
+
+        if (data.status === 'success' && strategy != null) {
+            return strategy;
+        }
+
+        return null;
     }
 
     function getCookie(name) {
@@ -157,12 +262,32 @@
     document.querySelector('.order-form').addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        if (!confirm('Are you sure you want to confirm this order?')) {
+        const strategy = document.getElementById('strategy').value;
+
+        console.log(strategy);
+
+        if (strategy != 'default') {
+            const response = await fetch(`/markets/get-strategy-details/${strategy}/`);
+
+            if (!response.ok) {
+                alert('Failed to fetch strategy details');  
+                return;
+            }
+
+            const data = await response.json();
+            const enterPositionExplanation = data.enter_position_explanation;
+            
+            if (!confirm("Using strategy: " + data.title + "\n" + "Enter Position Explanation: " + enterPositionExplanation)) {
+                return;
+            }
+        }
+        else if (!confirm('Are you sure you want to confirm this order?')) {
             return;
         }
 
         const form = e.target;
         const formData = new FormData(form);
+        formData.append('strategy', strategy);
 
         const response = await fetch(this.action, {
             method: 'POST',

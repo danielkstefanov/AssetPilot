@@ -4,6 +4,15 @@ from datetime import datetime
 from utils.trading import get_ticker_price
 
 
+class Strategy(models.Model):
+    title = models.CharField(max_length=200)
+    enter_position_explanation = models.TextField()
+    trade_exit_explanation = models.TextField()
+    creator = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True
+    )
+
+
 class Trade(models.Model):
     TRADE_TYPES = [
         ("BUY", "Buy"),
@@ -11,6 +20,9 @@ class Trade(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    strategy = models.ForeignKey(
+        Strategy, on_delete=models.SET_NULL, null=True, blank=True
+    )
     ticker = models.CharField(max_length=10)
     trade_type = models.CharField(max_length=4, choices=TRADE_TYPES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

@@ -147,10 +147,8 @@ def create_suggestions(allocation):
 
 
 def get_ai_suggestions(allocation):
-
-    prompt = f"The allocation of the portfolio is: {", ".join([f"{ticker}: {percentage}%" for ticker, percentage in allocation.items()])}"
-
     try:
+        prompt = f"The allocation of the portfolio is: {", ".join([f"{ticker}: {percentage}%" for ticker, percentage in allocation.items()])}"
         completion = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -256,3 +254,22 @@ def trade_detail(request, trade_id):
     }
 
     return render(request, "portfolio/trade_detail.html", context)
+
+
+@login_required
+def get_trade_strategy(request, trade_id):
+    try:
+        trade = Trade.objects.get(id=trade_id, user=request.user)
+        
+        if trade.strategy:
+            strategy = {
+                "title": trade.strategy.title,
+                "enter_position_explanation": trade.strategy.enter_position_explanation,
+                "trade_exit_explanation": trade.strategy.trade_exit_explanation,
+            }
+            return JsonResponse({ "status": "success", "strategy": strategy})
+        else:
+            return JsonResponse({ "status": "success", "strategy": None})
+            
+    except Exception as e:
+        return JsonResponse({"status": "error", "error": str(e)}, status=500)
