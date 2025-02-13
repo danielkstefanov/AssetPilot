@@ -63,19 +63,14 @@ def news(request):
 
     paginator = Paginator(news, 10)
     page = request.GET.get("page", 1)
-
-    try:
-        paginated_news = paginator.page(page)
-    except PageNotAnInteger:
-        paginated_news = paginator.page(1)
-    except EmptyPage:
-        paginated_news = paginator.page(paginator.num_pages)
+    paginated_news = paginator.page(page)
 
     featured_news = (
         paginated_news.object_list[:2]
         if len(paginated_news.object_list) >= 2
         else paginated_news.object_list
     )
+
     regular_news = (
         paginated_news.object_list[2:] if len(paginated_news.object_list) > 2 else []
     )
