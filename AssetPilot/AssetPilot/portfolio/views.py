@@ -2,7 +2,7 @@ from openai import OpenAI
 import os
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -18,30 +18,33 @@ def portfolio(request):
     open_trades = Trade.objects.filter(user=request.user, is_open=True)
 
     open_trades_data = []
-    for trade in open_trades:
-        current_price = get_ticker_price(trade.ticker)
-        enter_price = float(trade.enter_price)
+    try:
+        for trade in open_trades:
+            current_price = get_ticker_price(trade.ticker)
+            enter_price = float(trade.enter_price)
 
-        profit_loss_percentage = ((current_price - enter_price) / enter_price) * 100
+            profit_loss_percentage = ((current_price - enter_price) / enter_price) * 100
 
-        if trade.trade_type == "SELL":
-            profit_loss_percentage *= -1
+            if trade.trade_type == "SELL":
+                profit_loss_percentage *= -1
 
-        open_trades_data.append(
-            {
-                "id": trade.id,
-                "ticker": trade.ticker,
-                "amount": trade.amount,
-                "enter_price": trade.enter_price,
-                "current_price": current_price,
-                "trade_type": trade.trade_type,
-                "profit_loss_percentage": round(profit_loss_percentage, 2),
-            }
+            open_trades_data.append(
+                {
+                    "id": trade.id,
+                    "ticker": trade.ticker,
+                    "amount": trade.amount,
+                    "enter_price": trade.enter_price,
+                    "current_price": current_price,
+                    "trade_type": trade.trade_type,
+                    "profit_loss_percentage": round(profit_loss_percentage, 2),
+                }
+            )
+        
+        return render(
+            request, "portfolio/portfolio.html", {"open_trades_data": open_trades_data}
         )
-
-    return render(
-        request, "portfolio/portfolio.html", {"open_trades_data": open_trades_data}
-    )
+    except Exception as e:
+        print(e)
 
 
 @login_required
@@ -84,9 +87,12 @@ def portfolio_data(request):
             "allocation": allocation_data,
             "suggestions": suggestions,
             "portfolio_value": total_value,
-            "portfolio_return_percentage": (total_value - protfolio_original_size)
-            / protfolio_original_size
-            * 100,
+            "portfolio_return_percentage": (
+                (total_value - protfolio_original_size) / protfolio_original_size
+                * 100
+                if protfolio_original_size != 0
+                else 0
+            ),
             "portfolio_return_value": total_value - protfolio_original_size,
         }
     )
@@ -186,7 +192,10 @@ def close_trade(request, trade_id):
 
 @login_required
 def trade_detail(request, trade_id):
-    trade = Trade.objects.get(id=trade_id, user=request.user)
+    try:
+        trade = get_object_or_404(Trade, id=trade_id, user=request.user)
+    except Trade.DoesNotExist:
+        return render(request, "portfolio/trade_detail.html", {"error": "Trade not found"})
 
     if trade.is_open:
         current_price = get_ticker_price(trade.ticker)

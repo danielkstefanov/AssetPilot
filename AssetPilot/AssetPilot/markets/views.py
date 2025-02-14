@@ -133,7 +133,8 @@ def create_strategy(request):
                 "enter_position_explanation": strategy.enter_position_explanation,
                 "trade_exit_explanation": strategy.trade_exit_explanation,
                 "creator": strategy.creator.username,
-            }
+            },
+            status=200,
         )
     except:
         return JsonResponse({"error": "Failed to create strategy"}, status=400)

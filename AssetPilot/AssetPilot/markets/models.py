@@ -42,10 +42,6 @@ class Trade(models.Model):
                 check=models.Q(amount__gt=0),
                 name="amount_must_be_greater_than_0",
             ),
-            models.CheckConstraint(
-                check=models.Q(enter_date__lte=datetime.now()),
-                name="enter_date_must_be_in_the_past",
-            ),
         ]
 
     def close(self):

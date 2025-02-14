@@ -2,7 +2,7 @@ import uuid
 import os
 
 from decimal import Decimal
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from newsapi import NewsApiClient
@@ -88,7 +88,7 @@ def news(request):
 @login_required
 def news_details(request, news_id):
 
-    news_item = NewsItem.objects.filter(id=news_id).first()
+    news_item = get_object_or_404(NewsItem, id=news_id)
 
     if news_item.content is None:
         new_content = scrape_news_content(news_item.url)
