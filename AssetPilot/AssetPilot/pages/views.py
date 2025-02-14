@@ -8,6 +8,7 @@ from utils.trading import get_ticker_price
 import csv
 from io import TextIOWrapper
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 MAILJET_API_KEY = os.environ.get("MAILJET_API_KEY")
 MAILJET_API_SECRET = os.environ.get("MAILJET_API_SECRET")
@@ -27,7 +28,10 @@ def profile(request):
 
     open_trades_data = []
     for trade in open_trades:
-        current_price = get_ticker_price(trade.ticker)
+        try:
+            current_price = get_ticker_price(trade.ticker)
+        except Exception as e:
+            current_price = 0
         enter_price = float(trade.enter_price)
 
         profit_loss_percentage = ((current_price - enter_price) / enter_price) * 100
@@ -82,23 +86,29 @@ def contact_us_view(request):
         user_email = request.user.email
 
         if subject and message:
-            mailjet.send.create(
-                data={
-                    "Messages": [
-                        {
-                            "From": {"Email": user_email, "Name": "Asset Pilot"},
-                            "To": [{"Email": MAILJET_EMAIL, "Name": "Support Team"}],
-                            "Subject": subject,
-                            "TextPart": f"Message from {user_email}:\n\n{message}",
-                        }
-                    ]
-                }
-            )
+            try:
+                mailjet.send.create(
+                    data={
+                        "Messages": [
+                            {
+                                "From": {"Email": user_email, "Name": "Asset Pilot"},
+                                "To": [
+                                    {"Email": MAILJET_EMAIL, "Name": "Support Team"}
+                                ],
+                                "Subject": subject,
+                                "TextPart": f"Message from {user_email}:\n\n{message}",
+                            }
+                        ]
+                    }
+                )
+            except Exception as e:
+                print(e)
 
     return render(request, "pages/contact-us.html")
 
 
 @login_required
+@require_POST
 def import_trades(request):
     if request.method == "POST":
         csv_file = request.FILES["csv_file"]
